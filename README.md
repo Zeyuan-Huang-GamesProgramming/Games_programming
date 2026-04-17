@@ -1,78 +1,84 @@
-# 深空废站：最后撤离（Deep Space Derelict: Final Evac）
+# 深空废站：最后撤离（Deep Space Station: Last Evacuation）
 
-一个 3D 第一人称科幻生存撤离小游戏（Unity）。
+一个 Unity 第一人称科幻生存撤离小游戏。玩家在废弃空间站中修复关键系统，在氧气和倒计时压力下打开撤离通道并逃离。
 
-## 项目目标（Vertical Slice）
+## 当前完成内容
 
-本项目目标不是做“大而全”，而是完成一个 **10~15 分钟可玩、稳定、有反馈、有测试证据** 的垂直切片：
+- Unity 工程基础结构：`Assets/`、`Packages/`、`ProjectSettings/`
+- 第一人称移动和视角控制
+- 射线交互系统，按 `E` 与终端、门、氧气罐、撤离舱互动
+- 氧气系统：持续消耗、低氧失败、氧气罐补给
+- 倒计时系统：撤离窗口关闭后失败
+- 三个维修终端：`Life Support`、`Navigation`、`Reactor`
+- 门禁系统：普通门可打开，撤离门需要完成全部维修后解锁
+- 危险区：辐射泄漏会加速氧气消耗
+- 撤离舱胜利条件
+- HUD：氧气、剩余时间、维修进度、目标提示、交互提示、胜负界面
+- Unity Editor 一键生成可玩场景工具
 
-- 玩家在废弃空间站中探索
-- 完成 3 个关键修复任务
-- 在氧气和时间双重压力下撤离
+## 如何运行
 
-## 当前核心玩法
+1. 用 Unity Hub 打开仓库根目录。
+2. 推荐 Unity 版本：`2022.3 LTS`。
+3. 第一次打开后等待 Unity 导入项目。
+4. 在顶部菜单选择：`Deep Space Station -> Build Playable Scene`。
+5. 打开生成的场景：`Assets/Scenes/Station_A.unity`。
+6. 点击 Play 运行。
 
-- 第一人称移动 + 视角
-- `E` 键交互
-- 3 个任务终端
-- 氧气系统与倒计时
-- 胜负判定（撤离成功 / 氧气耗尽 / 时间耗尽）
+更详细步骤见：`UNITY_RUN.md`。
 
 ## 控制说明
 
 - `WASD`：移动
 - `Mouse`：视角
+- `Left Shift`：冲刺
 - `E`：交互
-- `Esc`：解锁鼠标（可在测试时用）
+- `Esc`：释放鼠标
+- `R`：胜利或失败后重开
 
-## 如何运行
+## 游戏目标
 
-1. 用 Unity Hub 打开项目（建议 Unity 2022 LTS 或更新版本）。
-2. 打开场景：`Assets/Scenes/Station_A.unity`（按开发文档搭建）。
-3. 点击 Play 运行。
+1. 找到并修复三个系统终端。
+2. 避开或快速穿过辐射泄漏区域。
+3. 必要时拾取氧气罐补给。
+4. 全部系统恢复后进入撤离舱。
 
-> 若当前仓库还未提交 Unity 工程文件，请先按《深空废站_最后撤离_开发指南.md》完成初始搭建。
-
-## 项目结构建议
+## 项目结构
 
 ```text
 Assets/
-  Scenes/
+  Editor/
+    DeepSpaceStationSceneBuilder.cs
   Scripts/
     Core/
     Player/
-    World/
     UI/
-  Prefabs/
-  Materials/
-  Audio/
-  Animations/
-Docs/
+    World/
+Packages/
+ProjectSettings/
+UNITY_RUN.md
 ```
 
 ## 开发文档
 
 - 实操开发指南：`深空废站_最后撤离_开发指南.md`
 - 评分对照与补全计划：`课程评分对照与补全计划.md`
+- Unity 运行说明：`UNITY_RUN.md`
 
-## 外部资源与版权声明（提交前必须填写）
+## 外部资源与版权声明
 
-请在这里记录所有第三方素材：
+当前版本使用 Unity 基础几何体、内置 UI 字体和代码生成材质，没有引入第三方模型、贴图、字体或音频。
 
-| 资源名称 | 来源链接 | 许可证 | 用途 | 是否允许商用 |
-|---|---|---|---|---|
-| TODO | TODO | TODO | TODO | TODO |
+| 资源名称 | 来源 | 许可证 | 用途 |
+|---|---|---|---|
+| Unity Primitive Meshes | Unity Engine | Unity 默认项目资源 | 场景几何体 |
+| Arial built-in font reference | Unity built-in resource | Unity 默认项目资源 | HUD 文本 |
 
-> 不明确授权的素材不要用。BGM、贴图、字体、模型都要记录来源和许可。
+## 测试与调试记录
 
-## 测试与调试记录（建议每周更新）
-
-- 测试日期：
-- 测试版本（Git commit）：
-- 测试范围：
-- 发现问题：
-- 修复结果：
-- 下一步改进：
+- 本分支已做静态文件检查：确认 12 个 C# 文件括号结构平衡。
+- 由于当前执行环境没有 Unity Editor，尚未在本机完成 Unity 导入和 Play Mode 测试。
+- 下一步建议：在 Unity 2022.3 LTS 中打开项目，运行 `Deep Space Station -> Build Playable Scene`，进入 Play Mode 验证完整流程。
 
 ## GitHub 使用规范（课程要求）
 
@@ -84,9 +90,3 @@ Docs/
   - 测试证据（截图/视频/日志）
   - 已知问题
 - 避免“最后一天一次性大提交”。
-
-## 里程碑建议
-
-- M1（概念与原型）：核心循环可跑通
-- M2（垂直切片）：有完整关卡流程与稳定 UI
-- M3（打磨提交）：优化反馈、Bug 修复、完成报告与演示稿
