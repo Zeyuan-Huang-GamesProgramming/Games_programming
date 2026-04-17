@@ -39,7 +39,7 @@ public class GameManager : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.R))
             {
                 UnityEngine.SceneManagement.SceneManager.LoadScene(
-                    UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex);
+                    UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
             }
 
             return;
