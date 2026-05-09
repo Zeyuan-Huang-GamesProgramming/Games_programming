@@ -1,0 +1,30 @@
+2D Game Improvement Assignment Change Log
+
+Project: Space Blaster / 2D Project
+
+What the game did before:
+- The game already had a main menu, level select, player shooting, enemies, score, high score, pause, victory, and game over flow.
+
+What I changed:
+- Added clearer in-game objective text so the player knows the goal while playing.
+- Added extra HUD information for lives/health, objective progress, power-up state, and feedback messages.
+- Added a Rapid Fire power-up. A yellow collectable spawns near the player; collecting it temporarily increases the player's fire rate.
+- Added screen feedback for enemy defeats, player damage, power-up spawning, power-up collection, victory, and game over.
+- Added clearer Instructions text in the main menu covering movement, aiming, shooting, the goal, and the new power-up.
+
+Why it improves the player experience:
+- The player can understand the goal without guessing.
+- The HUD shows useful values while playing, not just score.
+- The power-up changes gameplay by giving the player a temporary advantage.
+- Feedback messages make important actions easier to notice.
+
+Test plan:
+- Start from MainMenu.
+- Open Instructions and return to Main Menu.
+- Start Level 1.
+- Confirm the HUD shows objective progress, lives/health, and power-up status.
+- Collect the yellow Rapid Fire power-up and confirm shooting becomes faster.
+- Defeat enemies and confirm objective progress updates.
+- Lose all lives to check Game Over.
+- Restart or return through the existing UI flow.
+- Clear the enemy objective to check the victory flow.

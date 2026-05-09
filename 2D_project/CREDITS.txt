@@ -1,0 +1,14 @@
+2D Game Improvement Assignment Credits
+
+Original project:
+- Based on the provided 2D Project / Space Blaster Unity project and its included starter assets.
+
+Changes made for this assignment:
+- HUD/objective improvements, Rapid Fire power-up behavior, feedback messages, and assignment change log were added for the game improvement assignment.
+
+Included third-party or starter resources already present in the project:
+- TextMesh Pro package and included font resources.
+- Existing art, audio, UI, effects, scripts, and developer console assets included with the starter project.
+
+New borrowed resources:
+- No new external art, audio, fonts, tutorials, or code snippets were added.
