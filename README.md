@@ -6,10 +6,10 @@ A Unity coursework project for Games Programming.
 
 Deep Space Station: Last Evacuation is a first-person sci-fi survival escape game. The player explores a damaged space station, repairs key systems, collects access items and resources, avoids security robots, and reaches the escape pod before the station collapses.
 
-## Planning
+## Project Planning
 
-The project Kanban board is available here:
+The Kanban board is managed in GitHub Projects:
 
-- [KANBAN.md](KANBAN.md)
+- [Games-Programming Project Board](https://github.com/orgs/Zeyuan-Huang-GamesProgramming/projects/1)
 
-The board records completed work, current tasks, next tasks, stretch goals, and coursework milestones.
+The board records completed work, current tasks, review items, next tasks, and backlog/stretch goals for assessment.
