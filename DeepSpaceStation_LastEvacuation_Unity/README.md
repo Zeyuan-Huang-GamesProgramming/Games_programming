@@ -35,3 +35,9 @@ For more detailed setup steps, see `UNITY_RUN.md`.
 - HUD with oxygen, timer, repair progress, objectives, prompts, and end screens
 - Upgraded playable station layout with lights, path guides, props, and world-space labels
 - Unity Editor tool for generating the playable scene
+
+## Third-Party Assets and Attribution
+
+This project uses free third-party Unity resources for environment art and presentation. Their use, attribution, and public-repository distribution requirements are recorded in [THIRD_PARTY_ASSETS.md](THIRD_PARTY_ASSETS.md).
+
+Important: a locally retained readme for **Free Skyboxes - Space** states that redistribution of its raw asset pack is not permitted. Licence restrictions must be checked before publishing imported source assets in a public repository.
