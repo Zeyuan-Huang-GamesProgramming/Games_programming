@@ -9,10 +9,12 @@ public class GameObjectInteractor : MonoBehaviour
     private IInteractable currentTarget;
 
     public PlayerOxygen Oxygen { get; private set; }
+    public PlayerInventory Inventory { get; private set; }
 
     private void Awake()
     {
         Oxygen = GetComponent<PlayerOxygen>();
+        Inventory = GetComponent<PlayerInventory>();
         if (viewCamera == null)
         {
             viewCamera = Camera.main;
@@ -21,7 +23,7 @@ public class GameObjectInteractor : MonoBehaviour
 
     private void Update()
     {
-        if (GameManager.Instance == null || GameManager.Instance.IsGameEnded)
+        if (GameManager.Instance == null || GameManager.Instance.IsGameEnded || GameManager.Instance.IsPaused)
         {
             return;
         }
