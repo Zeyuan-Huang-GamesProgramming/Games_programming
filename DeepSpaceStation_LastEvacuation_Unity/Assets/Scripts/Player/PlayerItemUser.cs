@@ -38,6 +38,7 @@ public class PlayerItemUser : MonoBehaviour
     {
         if (inventory == null || !inventory.ConsumeItem("medkit"))
         {
+            GameAudio.Instance?.PlayDenied();
             HUDController.Instance?.ShowMessage("No medkit in backpack", 2f);
             return;
         }
@@ -50,11 +51,13 @@ public class PlayerItemUser : MonoBehaviour
     {
         if (inventory == null || !inventory.ConsumeItem("battery"))
         {
+            GameAudio.Instance?.PlayDenied();
             HUDController.Instance?.ShowMessage("No battery pack in backpack", 2f);
             return;
         }
 
         scanner?.Recharge(batteryRechargeAmount);
+        GameAudio.Instance?.PlayRecharge();
         HUDController.Instance?.ShowMessage("Scanner battery recharged", 2f);
     }
 }
