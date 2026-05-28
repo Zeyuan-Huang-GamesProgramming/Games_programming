@@ -23,8 +23,9 @@ public class GameObjectInteractor : MonoBehaviour
 
     private void Update()
     {
-        if (GameManager.Instance == null || GameManager.Instance.IsGameEnded || GameManager.Instance.IsPaused)
+        if (GameManager.Instance == null || GameManager.Instance.IsGameEnded || GameManager.Instance.IsPaused || GameManager.Instance.IsChoosingMode)
         {
+            HUDController.Instance?.SetPrompt("");
             return;
         }
 
