@@ -21,6 +21,7 @@ public class OxygenCanister : MonoBehaviour, IInteractable
 
         used = true;
         interactor.Oxygen.AddOxygen(oxygenAmount);
+        GameAudio.Instance?.PlayRefill();
         HUDController.Instance?.ShowMessage("Oxygen refilled", 2f);
 
         if (pickupAudio != null)
