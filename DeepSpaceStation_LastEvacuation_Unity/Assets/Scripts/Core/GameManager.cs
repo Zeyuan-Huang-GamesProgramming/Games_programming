@@ -2,6 +2,17 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
+    private const string EndlessHighScoreKey = "DSS.EndlessHighScore";
+    private const string EndlessLongestRunKey = "DSS.EndlessLongestRun";
+    private const string TimedBestRatingKey = "DSS.TimedBestRating";
+    private const string TimedFastestEscapeKey = "DSS.TimedFastestEscape";
+
+    public enum GameMode
+    {
+        TimedEvacuation,
+        EndlessSurvival
+    }
+
     public static GameManager Instance { get; private set; }
 
     [SerializeField] private int requiredRepairs = 7;
@@ -11,21 +22,36 @@ public class GameManager : MonoBehaviour
     [SerializeField] private float firstRadiationPulseDelay = 42f;
     [SerializeField] private float radiationPulseInterval = 78f;
     [SerializeField] private float radiationPulseDuration = 16f;
+    [SerializeField] private int endlessBaseScorePerRepair = 100;
+    [SerializeField] private int endlessScorePerThreatLevel = 300;
+    [SerializeField] private float endlessThreatGrowthPerLevel = 0.14f;
+    [SerializeField] private string timedSpawnPointName = "Timed Evacuation Spawn";
+    [SerializeField] private string endlessSpawnPointName = "Endless Survival Spawn";
 
+    private GameMode activeMode = GameMode.TimedEvacuation;
     private int completedRepairs;
     private float remainingTime;
+    private float missionElapsedTime;
     private float stationInstability;
     private float radiationPulseTimer;
     private float radiationPulseRemaining;
     private bool lifeSupportOnline;
     private bool reactorOnline;
     private int detectionCount;
+    private int endlessScore;
+    private int endlessThreatLevel = 1;
+    private bool waitingForModeSelection = true;
 
     public bool IsGameEnded { get; private set; }
     public bool IsPaused { get; private set; }
-    public bool AllRepairsComplete => completedRepairs >= requiredRepairs;
+    public bool IsChoosingMode => waitingForModeSelection;
+    public bool EndlessModeActive => !waitingForModeSelection && activeMode == GameMode.EndlessSurvival;
+    public bool TimedModeActive => !waitingForModeSelection && activeMode == GameMode.TimedEvacuation;
+    public bool AllRepairsComplete => TimedModeActive && completedRepairs >= requiredRepairs;
     public int CompletedRepairs => completedRepairs;
     public int RequiredRepairs => requiredRepairs;
+    public int EndlessScore => endlessScore;
+    public int EndlessThreatLevel => endlessThreatLevel;
     public float GlobalOxygenDrainMultiplier { get; private set; } = 1f;
     public float StationInstability => stationInstability;
     public bool RadiationPulseActive => radiationPulseRemaining > 0f;
@@ -45,15 +71,43 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        HUDController.Instance?.SetObjective("Open the pod bay exit with E, restore corridor systems, then unlock deeper rooms.");
+        ShowModeSelection();
+    }
+
+    private void ShowModeSelection()
+    {
+        waitingForModeSelection = true;
+        IsPaused = false;
+        Time.timeScale = 0f;
+        UnlockCursor();
+        UpdateObjectiveText();
         HUDController.Instance?.SetRepairs(completedRepairs, requiredRepairs);
         HUDController.Instance?.SetPressure(GlobalOxygenDrainMultiplier, stationInstability, false);
         HUDController.Instance?.SetInventory("No items");
-        HUDController.Instance?.ShowMessage("Open the pod bay bulkhead with E. The station gets worse over time.", 4f);
+        HUDController.Instance?.SetModeSelectionOpen(true);
+        HUDController.Instance?.SetRecordsSummary(BuildRecordSummary());
+        HUDController.Instance?.ShowMessage("", 0f);
+        GameAudio.Instance?.SetScannerActive(false);
     }
 
     private void Update()
     {
+        if (waitingForModeSelection)
+        {
+            HUDController.Instance?.SetModeSelectionOpen(true);
+            UnlockCursor();
+            if (Input.GetKeyDown(KeyCode.Alpha1))
+            {
+                StartTimedEvacuationMode();
+            }
+            else if (Input.GetKeyDown(KeyCode.Alpha2))
+            {
+                StartEndlessMode();
+            }
+
+            return;
+        }
+
         if (IsGameEnded)
         {
             if (Input.GetKeyDown(KeyCode.R))
@@ -80,39 +134,167 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        remainingTime = Mathf.Max(0f, remainingTime - Time.deltaTime);
+        missionElapsedTime += Time.deltaTime;
         UpdateStationPressure();
-        HUDController.Instance?.SetTimer(remainingTime);
+
+        if (TimedModeActive)
+        {
+            remainingTime = Mathf.Max(0f, remainingTime - Time.deltaTime);
+            HUDController.Instance?.SetTimer(remainingTime);
+        }
+        else
+        {
+            UpdateEndlessHUD();
+        }
+
         HUDController.Instance?.SetPressure(GlobalOxygenDrainMultiplier, stationInstability, RadiationPulseActive);
 
-        if (remainingTime <= 0f)
+        if (TimedModeActive && remainingTime <= 0f)
         {
             Lose("Evacuation window closed");
         }
     }
 
-    public void RegisterRepair(string systemName)
+    public void StartTimedEvacuationMode()
     {
-        if (IsGameEnded)
+        BeginMode(GameMode.TimedEvacuation);
+    }
+
+    public void StartEndlessMode()
+    {
+        BeginMode(GameMode.EndlessSurvival);
+    }
+
+    private void BeginMode(GameMode mode)
+    {
+        activeMode = mode;
+        waitingForModeSelection = false;
+        IsPaused = false;
+        Time.timeScale = 1f;
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+
+        HUDController.Instance?.SetModeSelectionOpen(false);
+        GameAudio.Instance?.PlayMissionStart();
+
+        if (EndlessModeActive)
+        {
+            MovePlayerToSpawn(endlessSpawnPointName);
+            completedRepairs = 0;
+            endlessScore = 0;
+            endlessThreatLevel = 1;
+            UpdateEndlessDifficulty();
+            UpdateEndlessHUD();
+            HUDController.Instance?.ShowBriefing(
+                "SURVIVAL PROTOCOL ACTIVE",
+                "Loop station repairs for score.\nEvery threat level increases robot pressure.",
+                4.2f);
+        }
+        else
+        {
+            MovePlayerToSpawn(timedSpawnPointName);
+            remainingTime = evacuationTimeLimit;
+            HUDController.Instance?.SetTimer(remainingTime);
+            HUDController.Instance?.SetRepairs(completedRepairs, requiredRepairs);
+            HUDController.Instance?.ShowBriefing(
+                "EVACUATION PROTOCOL ACTIVE",
+                "Restore seven systems before the launch window closes.\nReach the escape pod after authorization.",
+                4.2f);
+        }
+
+        UpdateObjectiveText();
+    }
+
+    private void MovePlayerToSpawn(string spawnName)
+    {
+        GameObject spawn = GameObject.Find(spawnName);
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        if (spawn == null || player == null)
         {
             return;
         }
 
-        completedRepairs = Mathf.Clamp(completedRepairs + 1, 0, requiredRepairs);
-        MarkSystemOnline(systemName);
-        stationInstability = Mathf.Max(0f, stationInstability - 0.08f);
-        HUDController.Instance?.SetRepairs(completedRepairs, requiredRepairs);
-        HUDController.Instance?.ShowMessage(systemName + " restored", 3f);
-
-        if (AllRepairsComplete)
+        CharacterController controller = player.GetComponent<CharacterController>();
+        bool controllerWasEnabled = controller != null && controller.enabled;
+        if (controller != null)
         {
-            HUDController.Instance?.SetObjective("All systems restored. Reach the escape pod.");
-            HUDController.Instance?.ShowMessage("Escape pod authorization unlocked", 4f);
+            controller.enabled = false;
+        }
+
+        player.transform.SetPositionAndRotation(spawn.transform.position, spawn.transform.rotation);
+
+        FirstPersonController movement = player.GetComponent<FirstPersonController>();
+        if (movement != null)
+        {
+            movement.ResetView();
+        }
+
+        if (controller != null)
+        {
+            controller.enabled = controllerWasEnabled;
+        }
+    }
+
+    public void RegisterRepair(string systemName)
+    {
+        if (IsGameEnded || waitingForModeSelection)
+        {
+            return;
+        }
+
+        int scoreGain = 0;
+        bool threatRaised = false;
+        if (EndlessModeActive)
+        {
+            completedRepairs++;
+            scoreGain = CalculateEndlessRepairScore(systemName);
+            endlessScore += scoreGain;
+            threatRaised = UpdateEndlessDifficulty();
         }
         else
         {
-            HUDController.Instance?.SetObjective("Systems restored: " + completedRepairs + "/" + requiredRepairs + ". Keep moving before oxygen pressure spikes.");
+            completedRepairs = Mathf.Clamp(completedRepairs + 1, 0, requiredRepairs);
         }
+
+        string effectMessage = ApplySystemRepairEffect(systemName);
+        stationInstability = Mathf.Max(0f, stationInstability - 0.08f);
+        UpdateStationPressure();
+        if (EndlessModeActive)
+        {
+            UpdateEndlessHUD();
+        }
+        else
+        {
+            HUDController.Instance?.SetRepairs(completedRepairs, requiredRepairs);
+            HUDController.Instance?.SetTimer(remainingTime);
+        }
+
+        HUDController.Instance?.SetPressure(GlobalOxygenDrainMultiplier, stationInstability, RadiationPulseActive);
+
+        string message = systemName + " restored";
+        if (EndlessModeActive)
+        {
+            message += "\nScore +" + scoreGain + "  Total " + endlessScore;
+        }
+
+        if (!string.IsNullOrEmpty(effectMessage))
+        {
+            message += "\n" + effectMessage;
+        }
+
+        if (threatRaised)
+        {
+            message += "\nThreat level " + endlessThreatLevel + ": robots search harder.";
+        }
+
+        if (TimedModeActive && AllRepairsComplete)
+        {
+            message += "\nEscape pod authorization unlocked.";
+        }
+
+        HUDController.Instance?.ShowMessage(message, AllRepairsComplete ? 5f : 4f);
+        GameAudio.Instance?.PlayRepairComplete();
+        UpdateObjectiveText();
     }
 
     public void AddInstability(float amount, string reason)
@@ -128,6 +310,10 @@ public class GameManager : MonoBehaviour
         if (!string.IsNullOrEmpty(reason))
         {
             HUDController.Instance?.ShowMessage(reason, 2.5f);
+            if (reason.StartsWith("Radiation"))
+            {
+                GameAudio.Instance?.PlayWarningPulse();
+            }
         }
     }
 
@@ -141,7 +327,10 @@ public class GameManager : MonoBehaviour
         IsGameEnded = true;
         Time.timeScale = 1f;
         UnlockCursor();
-        HUDController.Instance?.ShowEndScreen("EVACUATION SUCCESSFUL", "You restored the derelict station long enough to launch.\nDetections: " + detectionCount);
+        string recordBanner = CommitRunRecords(true);
+        GameAudio.Instance?.SetScannerActive(false);
+        GameAudio.Instance?.PlayVictory();
+        HUDController.Instance?.ShowEndScreen("EVACUATION SUCCESSFUL", BuildEndReport(true, "You restored the station long enough to launch."), recordBanner);
     }
 
     public void Lose(string reason)
@@ -154,7 +343,11 @@ public class GameManager : MonoBehaviour
         IsGameEnded = true;
         Time.timeScale = 1f;
         UnlockCursor();
-        HUDController.Instance?.ShowEndScreen("MISSION FAILED", reason);
+        string title = EndlessModeActive ? "ENDLESS RUN COMPLETE" : "MISSION FAILED";
+        string recordBanner = CommitRunRecords(false);
+        GameAudio.Instance?.SetScannerActive(false);
+        GameAudio.Instance?.PlayFailure();
+        HUDController.Instance?.ShowEndScreen(title, BuildEndReport(false, reason), recordBanner);
     }
 
     private static void UnlockCursor()
@@ -165,7 +358,7 @@ public class GameManager : MonoBehaviour
 
     public void SetPaused(bool paused)
     {
-        if (IsGameEnded)
+        if (IsGameEnded || waitingForModeSelection)
         {
             return;
         }
@@ -187,6 +380,7 @@ public class GameManager : MonoBehaviour
     public void RegisterDetection()
     {
         detectionCount++;
+        GameAudio.Instance?.PlayRobotAlert();
         HUDController.Instance?.ShowMessage("Security robot detected you", 2f);
     }
 
@@ -244,12 +438,52 @@ public class GameManager : MonoBehaviour
         GlobalOxygenDrainMultiplier = Mathf.Clamp(multiplier, 0.8f, 3.1f);
     }
 
-    private void MarkSystemOnline(string systemName)
+    private string ApplySystemRepairEffect(string systemName)
     {
         string lower = systemName.ToLowerInvariant();
+        if (lower.Contains("corridor relay"))
+        {
+            return EndlessModeActive ? "Relay loop rerouted: score chain extended." : "Bulkhead relay online: first side rooms unlocked.";
+        }
+
         if (lower.Contains("life support"))
         {
             lifeSupportOnline = true;
+            PlayerOxygen oxygen = FindObjectOfType<PlayerOxygen>();
+            if (oxygen != null)
+            {
+                oxygen.AddOxygen(18f);
+            }
+
+            return "Life Support online: oxygen drain reduced and O2 restored.";
+        }
+
+        if (lower.Contains("navigation"))
+        {
+            if (!EndlessModeActive)
+            {
+                remainingTime += 35f;
+                return "Navigation route mapped: evacuation timer +35s.";
+            }
+
+            return "Navigation data banked: robot patrol AI adapted.";
+        }
+
+        if (lower.Contains("medical"))
+        {
+            PlayerHealth health = FindObjectOfType<PlayerHealth>();
+            if (health != null)
+            {
+                health.Heal(28f);
+            }
+
+            return "Medical air mix online: suit integrity restored.";
+        }
+
+        if (lower.Contains("security"))
+        {
+            ApplySecurityOverride();
+            return "Security override online: robots detect and hit weaker.";
         }
 
         if (lower.Contains("reactor"))
@@ -257,6 +491,321 @@ public class GameManager : MonoBehaviour
             reactorOnline = true;
             radiationPulseRemaining = 0f;
             radiationPulseTimer = radiationPulseInterval * 1.4f;
+            stationInstability = Mathf.Max(0f, stationInstability - 0.12f);
+            return "Reactor stable: radiation surges temporarily halted.";
         }
+
+        if (lower.Contains("comms"))
+        {
+            if (!EndlessModeActive)
+            {
+                remainingTime += 25f;
+                return "Comms link online: evacuation signal boosted +25s.";
+            }
+
+            return "Comms packet scored: station threat matrix escalated.";
+        }
+
+        return "Station pressure stabilized.";
+    }
+
+    private int CalculateEndlessRepairScore(string systemName)
+    {
+        int score = endlessBaseScorePerRepair + Mathf.Max(0, endlessThreatLevel - 1) * 25;
+        string lower = systemName.ToLowerInvariant();
+        if (lower.Contains("reactor") || lower.Contains("security"))
+        {
+            score += 50;
+        }
+        else if (lower.Contains("life support") || lower.Contains("medical"))
+        {
+            score += 25;
+        }
+
+        return score;
+    }
+
+    private bool UpdateEndlessDifficulty()
+    {
+        if (!EndlessModeActive)
+        {
+            return false;
+        }
+
+        int previousLevel = endlessThreatLevel;
+        endlessThreatLevel = Mathf.Max(1, 1 + Mathf.FloorToInt(endlessScore / Mathf.Max(1, endlessScorePerThreatLevel)));
+        float threatMultiplier = 1f + (endlessThreatLevel - 1) * endlessThreatGrowthPerLevel;
+        SecurityRobot[] robots = FindObjectsOfType<SecurityRobot>();
+        foreach (SecurityRobot robot in robots)
+        {
+            robot.ApplyEndlessThreat(threatMultiplier);
+        }
+
+        stationInstability = Mathf.Clamp01(stationInstability + Mathf.Max(0, endlessThreatLevel - previousLevel) * 0.035f);
+        return endlessThreatLevel > previousLevel;
+    }
+
+    private void UpdateEndlessHUD()
+    {
+        HUDController.Instance?.SetTimerText("SCORE " + endlessScore.ToString("0000"));
+        HUDController.Instance?.SetRepairText("THREAT " + endlessThreatLevel + "  TASKS " + completedRepairs);
+    }
+
+    private void ApplySecurityOverride()
+    {
+        SecurityRobot[] robots = FindObjectsOfType<SecurityRobot>();
+        foreach (SecurityRobot robot in robots)
+        {
+            robot.ApplySecurityOverride();
+        }
+    }
+
+    private string BuildEndReport(bool success, string resultText)
+    {
+        PlayerHealth health = FindObjectOfType<PlayerHealth>();
+        PlayerOxygen oxygen = FindObjectOfType<PlayerOxygen>();
+        float healthValue = health == null ? 0f : health.CurrentHealth;
+        float oxygenValue = oxygen == null ? 0f : oxygen.CurrentOxygen;
+
+        if (EndlessModeActive)
+        {
+            return resultText
+                + "\n\nFINAL SCORE     " + endlessScore
+                + "\nTHREAT LEVEL    " + endlessThreatLevel
+                + "\nTASKS COMPLETED " + completedRepairs
+                + "\nSURVIVAL TIME   " + FormatTime(missionElapsedTime)
+                + "\nHEALTH REMAINING " + Mathf.CeilToInt(healthValue) + "%"
+                + "\nO2 REMAINING     " + Mathf.CeilToInt(oxygenValue) + "%"
+                + "\nDETECTIONS       " + detectionCount
+                + "\nRANK             " + CalculateEndlessRank()
+                + "\nCAREER BEST      " + PlayerPrefs.GetInt(EndlessHighScoreKey, 0).ToString("0000");
+        }
+
+        string rank = success ? CalculateRank(healthValue, oxygenValue) : "F";
+
+        return resultText
+            + "\n\nMISSION TIME     " + FormatTime(missionElapsedTime)
+            + "\nSYSTEMS RESTORED " + completedRepairs + "/" + requiredRepairs
+            + "\nHEALTH REMAINING " + Mathf.CeilToInt(healthValue) + "%"
+            + "\nO2 REMAINING     " + Mathf.CeilToInt(oxygenValue) + "%"
+            + "\nDETECTIONS       " + detectionCount
+            + "\nRANK             " + rank
+            + "\nFASTEST ESCAPE   " + FormatRecordTime(PlayerPrefs.GetFloat(TimedFastestEscapeKey, -1f));
+    }
+
+    private string CalculateEndlessRank()
+    {
+        if (endlessScore >= 2200)
+        {
+            return "S";
+        }
+
+        if (endlessScore >= 1500)
+        {
+            return "A";
+        }
+
+        if (endlessScore >= 900)
+        {
+            return "B";
+        }
+
+        if (endlessScore >= 450)
+        {
+            return "C";
+        }
+
+        return "D";
+    }
+
+    private string CalculateRank(float healthValue, float oxygenValue)
+    {
+        return RankForRating(CalculateTimedRating(healthValue, oxygenValue));
+    }
+
+    private int CalculateTimedRating(float healthValue, float oxygenValue)
+    {
+        int score = 100;
+        score -= detectionCount * 10;
+        score -= Mathf.FloorToInt(missionElapsedTime / 60f) * 2;
+        score -= Mathf.FloorToInt((100f - healthValue) / 5f);
+        score -= Mathf.FloorToInt((100f - oxygenValue) / 8f);
+        score += Mathf.Max(0, completedRepairs - 5) * 3;
+        return Mathf.Clamp(score, 0, 100);
+    }
+
+    private static string RankForRating(int score)
+    {
+        if (score >= 90)
+        {
+            return "S";
+        }
+
+        if (score >= 75)
+        {
+            return "A";
+        }
+
+        if (score >= 60)
+        {
+            return "B";
+        }
+
+        if (score >= 45)
+        {
+            return "C";
+        }
+
+        return "D";
+    }
+
+    private string CommitRunRecords(bool success)
+    {
+        if (EndlessModeActive)
+        {
+            int bestScore = PlayerPrefs.GetInt(EndlessHighScoreKey, 0);
+            float longestRun = PlayerPrefs.GetFloat(EndlessLongestRunKey, 0f);
+            bool isHighScore = endlessScore > bestScore;
+            bool isLongestRun = missionElapsedTime > longestRun;
+
+            if (isHighScore)
+            {
+                PlayerPrefs.SetInt(EndlessHighScoreKey, endlessScore);
+            }
+
+            if (isLongestRun)
+            {
+                PlayerPrefs.SetFloat(EndlessLongestRunKey, missionElapsedTime);
+            }
+
+            PlayerPrefs.Save();
+            if (isHighScore)
+            {
+                return "NEW HIGH SCORE  //  " + endlessScore.ToString("0000");
+            }
+
+            if (isLongestRun)
+            {
+                return "NEW SURVIVAL RECORD  //  " + FormatTime(missionElapsedTime);
+            }
+
+            return "HIGH SCORE  //  " + bestScore.ToString("0000");
+        }
+
+        if (!success)
+        {
+            return "RECORD LOCKED  //  COMPLETE EXTRACTION TO QUALIFY";
+        }
+
+        PlayerHealth health = FindObjectOfType<PlayerHealth>();
+        PlayerOxygen oxygen = FindObjectOfType<PlayerOxygen>();
+        float healthValue = health == null ? 0f : health.CurrentHealth;
+        float oxygenValue = oxygen == null ? 0f : oxygen.CurrentOxygen;
+        int rating = CalculateTimedRating(healthValue, oxygenValue);
+        int bestRating = PlayerPrefs.GetInt(TimedBestRatingKey, -1);
+        float fastestEscape = PlayerPrefs.GetFloat(TimedFastestEscapeKey, -1f);
+        bool isBestRating = rating > bestRating;
+        bool isFastestEscape = fastestEscape < 0f || missionElapsedTime < fastestEscape;
+
+        if (isBestRating)
+        {
+            PlayerPrefs.SetInt(TimedBestRatingKey, rating);
+        }
+
+        if (isFastestEscape)
+        {
+            PlayerPrefs.SetFloat(TimedFastestEscapeKey, missionElapsedTime);
+        }
+
+        PlayerPrefs.Save();
+        if (isFastestEscape)
+        {
+            return "NEW EVACUATION RECORD  //  " + FormatTime(missionElapsedTime);
+        }
+
+        if (isBestRating)
+        {
+            return "NEW PERFORMANCE RECORD  //  RANK " + RankForRating(rating);
+        }
+
+        return "FASTEST ESCAPE  //  " + FormatRecordTime(fastestEscape);
+    }
+
+    private string BuildRecordSummary()
+    {
+        int bestRating = PlayerPrefs.GetInt(TimedBestRatingKey, -1);
+        int highScore = PlayerPrefs.GetInt(EndlessHighScoreKey, 0);
+        float fastestEscape = PlayerPrefs.GetFloat(TimedFastestEscapeKey, -1f);
+        float longestRun = PlayerPrefs.GetFloat(EndlessLongestRunKey, 0f);
+        string rank = bestRating < 0 ? "--" : RankForRating(bestRating);
+
+        return "TIMED   FASTEST " + FormatRecordTime(fastestEscape) + "   BEST RANK " + rank
+            + "\nENDLESS HIGH SCORE " + highScore.ToString("0000") + "   LONGEST " + FormatRecordTime(longestRun);
+    }
+
+    private static string FormatRecordTime(float seconds)
+    {
+        return seconds <= 0f ? "--:--" : FormatTime(seconds);
+    }
+
+    private static string FormatTime(float seconds)
+    {
+        int minutes = Mathf.FloorToInt(seconds / 60f);
+        int secs = Mathf.FloorToInt(seconds % 60f);
+        return minutes.ToString("00") + ":" + secs.ToString("00");
+    }
+
+    private void UpdateObjectiveText()
+    {
+        if (HUDController.Instance == null)
+        {
+            return;
+        }
+
+        if (waitingForModeSelection)
+        {
+            HUDController.Instance.SetObjective("SELECT MODE\n1 Timed Evacuation\n2 Endless Survival");
+            return;
+        }
+
+        if (EndlessModeActive)
+        {
+            HUDController.Instance.SetObjective("ENDLESS SURVIVAL\nRepair terminals for score.\nHigher score raises robot threat.");
+            return;
+        }
+
+        if (AllRepairsComplete)
+        {
+            HUDController.Instance.SetObjective("NEXT: Reach the escape pod\nAll systems online. Avoid robots.");
+            return;
+        }
+
+        string objective;
+        switch (completedRepairs)
+        {
+            case 0:
+                objective = "NEXT: Open pod bay door\nRepair Corridor Relay terminal.";
+                break;
+            case 1:
+                objective = "NEXT: Restore side systems\nLife Support + Navigation unlocked.";
+                break;
+            case 2:
+                objective = "NEXT: Enter Medical Bay\nFind Reactor Fuse while repairing systems.";
+                break;
+            case 3:
+                objective = "NEXT: Open Security Office\nUse Security Keycard if required.";
+                break;
+            case 4:
+                objective = "NEXT: Restore Reactor\nUse Reactor Fuse to clear the lock.";
+                break;
+            case 5:
+                objective = "NEXT: Restore Comms Lab\nUse Comms Decoder if required.";
+                break;
+            default:
+                objective = "NEXT: Restore remaining system\nThen return to escape pod.";
+                break;
+        }
+
+        HUDController.Instance.SetObjective(objective);
     }
 }
