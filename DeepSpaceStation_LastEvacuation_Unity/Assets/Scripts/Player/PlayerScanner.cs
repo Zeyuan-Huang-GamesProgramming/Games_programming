@@ -8,6 +8,7 @@ public class PlayerScanner : MonoBehaviour
     [SerializeField] private float batteryDrainPerSecond = 11f;
 
     private float currentBattery;
+    private bool scannerActive;
 
     public float CurrentBattery => currentBattery;
     public float NormalizedBattery => maxBattery <= 0f ? 0f : currentBattery / maxBattery;
@@ -23,6 +24,7 @@ public class PlayerScanner : MonoBehaviour
     {
         if (GameManager.Instance == null || GameManager.Instance.IsGameEnded || GameManager.Instance.IsPaused)
         {
+            SetScannerAudio(false);
             HUDController.Instance?.SetScan(false, "");
             return;
         }
@@ -30,10 +32,12 @@ public class PlayerScanner : MonoBehaviour
         bool scanning = Input.GetKey(KeyCode.Q) && currentBattery > 0f;
         if (!scanning)
         {
+            SetScannerAudio(false);
             HUDController.Instance?.SetScan(false, "");
             return;
         }
 
+        SetScannerAudio(true);
         currentBattery = Mathf.Max(0f, currentBattery - batteryDrainPerSecond * Time.deltaTime);
         HUDController.Instance?.SetBattery(NormalizedBattery, currentBattery);
         HUDController.Instance?.SetScan(true, BuildScanText());
@@ -43,6 +47,17 @@ public class PlayerScanner : MonoBehaviour
     {
         currentBattery = Mathf.Clamp(currentBattery + amount, 0f, maxBattery);
         HUDController.Instance?.SetBattery(NormalizedBattery, currentBattery);
+    }
+
+    private void SetScannerAudio(bool active)
+    {
+        if (scannerActive == active)
+        {
+            return;
+        }
+
+        scannerActive = active;
+        GameAudio.Instance?.SetScannerActive(active);
     }
 
     private string BuildScanText()
