@@ -25,6 +25,7 @@ public class PlayerOxygen : MonoBehaviour
         float globalMultiplier = GameManager.Instance == null ? 1f : GameManager.Instance.GlobalOxygenDrainMultiplier;
         CurrentOxygen = Mathf.Max(0f, CurrentOxygen - drainPerSecond * localDrainMultiplier * globalMultiplier * Time.deltaTime);
         HUDController.Instance?.SetOxygen(NormalizedOxygen, CurrentOxygen);
+        GameAudio.Instance?.UpdateOxygenWarning(NormalizedOxygen);
 
         if (CurrentOxygen <= 0f)
         {
