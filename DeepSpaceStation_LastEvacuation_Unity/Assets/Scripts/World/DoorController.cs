@@ -13,6 +13,7 @@ public class DoorController : MonoBehaviour, IInteractable
 
     private Vector3 closedPosition;
     private Vector3 targetPosition;
+    private bool opening;
     private bool opened;
     private bool itemUnlocked;
 
@@ -29,7 +30,23 @@ public class DoorController : MonoBehaviour, IInteractable
 
     private void Update()
     {
-        doorPanel.localPosition = Vector3.Lerp(doorPanel.localPosition, targetPosition, openSpeed * Time.deltaTime);
+        if (doorPanel == null || !opening)
+        {
+            return;
+        }
+
+        doorPanel.localPosition = Vector3.MoveTowards(
+            doorPanel.localPosition,
+            targetPosition,
+            openSpeed * Time.deltaTime);
+
+        if (Vector3.SqrMagnitude(doorPanel.localPosition - targetPosition) <= 0.0001f)
+        {
+            doorPanel.localPosition = targetPosition;
+            opening = false;
+            opened = true;
+            ClearDoorwayBlockers();
+        }
     }
 
     public string GetPrompt()
@@ -37,6 +54,11 @@ public class DoorController : MonoBehaviour, IInteractable
         if (opened)
         {
             return "Door open";
+        }
+
+        if (opening)
+        {
+            return "Door opening";
         }
 
         if (requiresRepairs && GameManager.Instance != null && GameManager.Instance.CompletedRepairs < GetRequiredRepairs())
@@ -54,13 +76,14 @@ public class DoorController : MonoBehaviour, IInteractable
 
     public void Interact(GameObjectInteractor interactor)
     {
-        if (opened)
+        if (opened || opening)
         {
             return;
         }
 
         if (requiresRepairs && GameManager.Instance != null && GameManager.Instance.CompletedRepairs < GetRequiredRepairs())
         {
+            GameAudio.Instance?.PlayDenied();
             HUDController.Instance?.ShowMessage("Door locked by emergency protocol", 2.5f);
             return;
         }
@@ -70,6 +93,7 @@ public class DoorController : MonoBehaviour, IInteractable
             PlayerInventory inventory = interactor == null ? null : interactor.Inventory;
             if (inventory == null || !inventory.HasItem(requiredItemName))
             {
+                GameAudio.Instance?.PlayDenied();
                 HUDController.Instance?.ShowMessage("Need " + GetRequiredItemDisplayName(), 2.5f);
                 return;
             }
@@ -83,8 +107,95 @@ public class DoorController : MonoBehaviour, IInteractable
             HUDController.Instance?.ShowMessage(GetRequiredItemDisplayName() + " accepted", 2f);
         }
 
-        opened = true;
+        opening = true;
         targetPosition = closedPosition + openOffset;
+        GameAudio.Instance?.PlayDoorOpen();
+    }
+
+    private void ClearDoorwayBlockers()
+    {
+        DisableDoorBlockers();
+        DisableCentralDoorwayObjects();
+    }
+
+    private void DisableDoorBlockers()
+    {
+        if (doorPanel == null)
+        {
+            return;
+        }
+
+        Collider[] colliders = doorPanel.GetComponentsInChildren<Collider>(true);
+        foreach (Collider collider in colliders)
+        {
+            if (!collider.isTrigger)
+            {
+                collider.enabled = false;
+            }
+        }
+    }
+
+    private void DisableCentralDoorwayObjects()
+    {
+        BoxCollider trigger = GetComponent<BoxCollider>();
+        float clearHalfWidth = 1.8f;
+        if (trigger != null)
+        {
+            clearHalfWidth = Mathf.Max(1.2f, (trigger.size.x - 1.3f) * 0.5f + 0.2f);
+        }
+
+        Renderer[] renderers = GetComponentsInChildren<Renderer>(true);
+        foreach (Renderer sceneRenderer in renderers)
+        {
+            if (ShouldClearDoorwayObject(sceneRenderer.transform, clearHalfWidth))
+            {
+                sceneRenderer.enabled = false;
+            }
+        }
+
+        Collider[] colliders = GetComponentsInChildren<Collider>(true);
+        foreach (Collider collider in colliders)
+        {
+            if (collider == trigger || collider.isTrigger)
+            {
+                continue;
+            }
+
+            if (IsPermanentDoorFrame(collider.transform) || ShouldClearDoorwayObject(collider.transform, clearHalfWidth))
+            {
+                collider.enabled = false;
+            }
+        }
+    }
+
+    private bool ShouldClearDoorwayObject(Transform candidate, float clearHalfWidth)
+    {
+        if (candidate == null || candidate == transform)
+        {
+            return false;
+        }
+
+        string objectName = candidate.name.ToLowerInvariant();
+        if (IsPermanentDoorFrame(candidate))
+        {
+            return false;
+        }
+
+        if (objectName.Contains("sliding panel") || objectName.Contains("status strip") || objectName.Contains("center access line"))
+        {
+            return true;
+        }
+
+        Vector3 localPosition = transform.InverseTransformPoint(candidate.position);
+        return Mathf.Abs(localPosition.x) <= clearHalfWidth
+            && localPosition.y > -1.25f
+            && localPosition.y < 1.35f
+            && Mathf.Abs(localPosition.z) < 0.85f;
+    }
+
+    private bool IsPermanentDoorFrame(Transform candidate)
+    {
+        return candidate != null && candidate.name.ToLowerInvariant().Contains("permanent frame");
     }
 
     private int GetRequiredRepairs()
