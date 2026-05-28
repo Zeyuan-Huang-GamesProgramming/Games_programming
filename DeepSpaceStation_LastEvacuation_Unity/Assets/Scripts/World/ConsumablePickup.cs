@@ -22,6 +22,7 @@ public class ConsumablePickup : MonoBehaviour, IInteractable
 
         collected = true;
         interactor.Inventory.AddItem(itemName, displayName, quantity);
+        GameAudio.Instance?.PlayPickup();
         HUDController.Instance?.ShowMessage(displayName + " added to backpack", 2.4f);
 
         foreach (Renderer renderer in GetComponentsInChildren<Renderer>())
