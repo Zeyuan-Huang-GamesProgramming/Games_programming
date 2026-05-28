@@ -10,12 +10,14 @@ public class TerminalTask : MonoBehaviour, IInteractable
     [SerializeField] private Color onlineColor = new Color(0.08f, 1f, 0.65f);
     [SerializeField] private float repairSeconds = 4f;
     [SerializeField] private float abandonDistance = 4.8f;
+    [SerializeField] private float endlessResetSeconds = 8f;
     [SerializeField] private KeyCode[] calibrationSequence = { KeyCode.Alpha1, KeyCode.Alpha2, KeyCode.Alpha3 };
 
     private bool repaired;
     private bool active;
     private int sequenceIndex;
     private float repairProgress;
+    private float repairedTimer;
     private GameObjectInteractor activeInteractor;
 
     private void Start()
@@ -25,7 +27,13 @@ public class TerminalTask : MonoBehaviour, IInteractable
 
     private void Update()
     {
-        if (!active || repaired)
+        if (repaired)
+        {
+            HandleEndlessReset();
+            return;
+        }
+
+        if (!active)
         {
             return;
         }
@@ -68,6 +76,12 @@ public class TerminalTask : MonoBehaviour, IInteractable
     {
         if (repaired)
         {
+            if (GameManager.Instance != null && GameManager.Instance.EndlessModeActive)
+            {
+                int seconds = Mathf.CeilToInt(Mathf.Max(0f, endlessResetSeconds - repairedTimer));
+                return systemName + " rebooting " + seconds + "s";
+            }
+
             return systemName + " online";
         }
 
@@ -99,6 +113,7 @@ public class TerminalTask : MonoBehaviour, IInteractable
             sequenceIndex = 0;
             repairProgress = 0f;
             ApplyState();
+            GameAudio.Instance?.PlayTerminalStart();
             HUDController.Instance?.ShowMessage(systemName + " diagnostic started. Follow the number sequence.", 3f);
             return;
         }
@@ -124,6 +139,7 @@ public class TerminalTask : MonoBehaviour, IInteractable
         if (pressed == calibrationSequence[sequenceIndex])
         {
             sequenceIndex++;
+            GameAudio.Instance?.PlayCalibrationStep();
             if (sequenceIndex >= calibrationSequence.Length)
             {
                 HUDController.Instance?.ShowMessage(systemName + " calibrated. Hold E to route power.", 2.4f);
@@ -133,6 +149,7 @@ public class TerminalTask : MonoBehaviour, IInteractable
 
         sequenceIndex = 0;
         repairProgress = 0f;
+        GameAudio.Instance?.PlayCalibrationError();
         GameManager.Instance?.AddInstability(0.08f, "Wrong input caused a pressure spike");
         ApplyState();
     }
@@ -141,8 +158,32 @@ public class TerminalTask : MonoBehaviour, IInteractable
     {
         repaired = true;
         active = false;
+        activeInteractor = null;
+        repairedTimer = 0f;
         ApplyState();
         GameManager.Instance.RegisterRepair(systemName);
+    }
+
+    private void HandleEndlessReset()
+    {
+        if (GameManager.Instance == null || !GameManager.Instance.EndlessModeActive || GameManager.Instance.IsGameEnded)
+        {
+            return;
+        }
+
+        repairedTimer += Time.deltaTime;
+        if (repairedTimer < endlessResetSeconds)
+        {
+            return;
+        }
+
+        repaired = false;
+        active = false;
+        activeInteractor = null;
+        sequenceIndex = 0;
+        repairProgress = 0f;
+        repairedTimer = 0f;
+        ApplyState();
     }
 
     private void AbortRepair(string reason)
@@ -152,6 +193,7 @@ public class TerminalTask : MonoBehaviour, IInteractable
         sequenceIndex = 0;
         repairProgress = 0f;
         ApplyState();
+        GameAudio.Instance?.PlayDenied();
         HUDController.Instance?.ShowMessage(reason, 2f);
     }
 
