@@ -20,6 +20,19 @@ public class FirstPersonController : MonoBehaviour
     public bool IsCrouching { get; private set; }
     public bool IsSprinting { get; private set; }
 
+    public void ResetView()
+    {
+        verticalVelocity = 0f;
+        pitch = 0f;
+        IsCrouching = false;
+        IsSprinting = false;
+
+        if (playerCamera != null)
+        {
+            playerCamera.transform.localRotation = Quaternion.identity;
+        }
+    }
+
     private void Awake()
     {
         controller = GetComponent<CharacterController>();
@@ -37,13 +50,16 @@ public class FirstPersonController : MonoBehaviour
 
     private void Start()
     {
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+        if (GameManager.Instance == null || !GameManager.Instance.IsChoosingMode)
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        }
     }
 
     private void Update()
     {
-        if (GameManager.Instance != null && (GameManager.Instance.IsGameEnded || GameManager.Instance.IsPaused))
+        if (GameManager.Instance != null && (GameManager.Instance.IsGameEnded || GameManager.Instance.IsPaused || GameManager.Instance.IsChoosingMode))
         {
             return;
         }
@@ -54,8 +70,9 @@ public class FirstPersonController : MonoBehaviour
 
     private void Look()
     {
-        float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity;
-        float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity;
+        float activeSensitivity = GameSettings.GetMouseSensitivity(mouseSensitivity);
+        float mouseX = Input.GetAxis("Mouse X") * activeSensitivity;
+        float mouseY = Input.GetAxis("Mouse Y") * activeSensitivity;
 
         transform.Rotate(Vector3.up * mouseX);
         pitch = Mathf.Clamp(pitch - mouseY, -78f, 78f);
