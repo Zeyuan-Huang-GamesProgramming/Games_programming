@@ -21,6 +21,7 @@ public class PlayerHealth : MonoBehaviour
         }
 
         CurrentHealth = Mathf.Max(0f, CurrentHealth - amount);
+        GameAudio.Instance?.PlayDamage();
         HUDController.Instance?.SetHealth(NormalizedHealth, CurrentHealth);
 
         if (CurrentHealth <= 0f)
@@ -32,6 +33,7 @@ public class PlayerHealth : MonoBehaviour
     public void Heal(float amount)
     {
         CurrentHealth = Mathf.Clamp(CurrentHealth + amount, 0f, maxHealth);
+        GameAudio.Instance?.PlayHeal();
         HUDController.Instance?.SetHealth(NormalizedHealth, CurrentHealth);
     }
 }
