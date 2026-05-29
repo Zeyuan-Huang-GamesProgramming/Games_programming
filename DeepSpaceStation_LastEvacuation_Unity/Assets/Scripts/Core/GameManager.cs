@@ -343,11 +343,11 @@ public class GameManager : MonoBehaviour
         IsGameEnded = true;
         Time.timeScale = 1f;
         UnlockCursor();
-        string title = EndlessModeActive ? "ENDLESS RUN COMPLETE" : "MISSION FAILED";
+        string title = BuildFailureTitle(reason);
         string recordBanner = CommitRunRecords(false);
         GameAudio.Instance?.SetScannerActive(false);
         GameAudio.Instance?.PlayFailure();
-        HUDController.Instance?.ShowEndScreen(title, BuildEndReport(false, reason), recordBanner);
+        HUDController.Instance?.ShowEndScreen(title, BuildEndReport(false, BuildFailureSummary(reason)), recordBanner);
     }
 
     private static void UnlockCursor()
@@ -591,6 +591,86 @@ public class GameManager : MonoBehaviour
             + "\nDETECTIONS       " + detectionCount
             + "\nRANK             " + rank
             + "\nFASTEST ESCAPE   " + FormatRecordTime(PlayerPrefs.GetFloat(TimedFastestEscapeKey, -1f));
+    }
+
+    private string BuildFailureTitle(string reason)
+    {
+        string label = GetFailureLabel(reason);
+        return EndlessModeActive ? "ENDLESS RUN COMPLETE // " + label : "MISSION FAILED // " + label;
+    }
+
+    private string BuildFailureSummary(string reason)
+    {
+        return "FAILURE REASON: " + GetFailureReadableReason(reason)
+            + "\n" + GetFailureAdvice(reason);
+    }
+
+    private static string GetFailureLabel(string reason)
+    {
+        string normalized = NormalizeFailureReason(reason);
+        if (normalized.Contains("oxygen"))
+        {
+            return "OXYGEN DEPLETED";
+        }
+
+        if (normalized.Contains("evacuation window") || normalized.Contains("time"))
+        {
+            return "TIME EXPIRED";
+        }
+
+        if (normalized.Contains("integrity") || normalized.Contains("health"))
+        {
+            return "SUIT INTEGRITY LOST";
+        }
+
+        return "MISSION LOST";
+    }
+
+    private static string GetFailureReadableReason(string reason)
+    {
+        string normalized = NormalizeFailureReason(reason);
+        if (normalized.Contains("oxygen"))
+        {
+            return "Oxygen reached zero.";
+        }
+
+        if (normalized.Contains("evacuation window") || normalized.Contains("time"))
+        {
+            return "The evacuation timer reached zero.";
+        }
+
+        if (normalized.Contains("integrity") || normalized.Contains("health"))
+        {
+            return "Health reached zero after suit damage.";
+        }
+
+        return string.IsNullOrWhiteSpace(reason) ? "Unknown system failure." : reason;
+    }
+
+    private static string GetFailureAdvice(string reason)
+    {
+        string normalized = NormalizeFailureReason(reason);
+        if (normalized.Contains("oxygen"))
+        {
+            return "NEXT ATTEMPT: collect O2 canisters, avoid radiation leaks, and repair Life Support earlier.";
+        }
+
+        if (normalized.Contains("evacuation window") || normalized.Contains("time"))
+        {
+            return "NEXT ATTEMPT: prioritize terminals, unlock bulkheads quickly, and use route shortcuts.";
+        }
+
+        if (normalized.Contains("integrity") || normalized.Contains("health"))
+        {
+            return "NEXT ATTEMPT: break line of sight from robots, crouch near patrols, and use medkits.";
+        }
+
+        return "NEXT ATTEMPT: review the final status readout and adjust your route.";
+    }
+
+    private static string NormalizeFailureReason(string reason)
+    {
+        return string.IsNullOrWhiteSpace(reason) ? string.Empty : reason.ToLowerInvariant();
     }
 
     private string CalculateEndlessRank()
