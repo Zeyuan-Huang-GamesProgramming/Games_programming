@@ -40,6 +40,22 @@ public class HUDController : MonoBehaviour
     private float messageTimer;
     private float briefingTimer;
     private bool backpackOpen;
+    private bool oxygenCriticalActive;
+    private bool healthCriticalActive;
+    private bool timeCriticalActive;
+
+    private const float OxygenCriticalThreshold = 0.1f;
+    private const float OxygenWarningThreshold = 0.25f;
+    private const float HealthCriticalThreshold = 0.3f;
+    private const float TimerWarningSeconds = 60f;
+    private const float WarningFlashSpeed = 8f;
+
+    private readonly Color oxygenNormalColor = new Color(0.05f, 0.95f, 0.8f);
+    private readonly Color oxygenWarningColor = new Color(1f, 0.68f, 0.08f);
+    private readonly Color criticalColor = new Color(1f, 0.16f, 0.08f);
+    private readonly Color healthNormalColor = new Color(0.08f, 0.5f, 1f);
+    private readonly Color timerNormalColor = new Color(0.6f, 0.95f, 1f);
+    private readonly Color timerWarningColor = new Color(1f, 0.22f, 0.12f);
 
     private void Awake()
     {
@@ -86,7 +102,8 @@ public class HUDController : MonoBehaviour
             messageTimer -= Time.deltaTime;
             if (messageTimer <= 0f && messageText != null)
             {
-                messageText.text = "";
+                messageTimer = 0f;
+                UpdatePersistentWarning();
             }
         }
 
@@ -102,30 +119,68 @@ public class HUDController : MonoBehaviour
 
     public void SetOxygen(float normalized, float value)
     {
+        float clamped = Mathf.Clamp01(normalized);
+        int roundedValue = Mathf.CeilToInt(value);
+        oxygenCriticalActive = clamped < OxygenCriticalThreshold;
+        bool oxygenWarningActive = clamped < OxygenWarningThreshold;
+        Color oxygenColor = oxygenNormalColor;
+
+        if (oxygenCriticalActive)
+        {
+            oxygenColor = GetFlashingColor(criticalColor, Color.white, 0.9f);
+        }
+        else if (oxygenWarningActive)
+        {
+            oxygenColor = GetFlashingColor(oxygenWarningColor, criticalColor, 0.6f);
+        }
+
         if (oxygenText != null)
         {
-            oxygenText.text = "O2 " + Mathf.CeilToInt(value) + "%";
+            if (oxygenCriticalActive)
+            {
+                oxygenText.text = "O2 CRITICAL " + roundedValue + "%";
+            }
+            else if (oxygenWarningActive)
+            {
+                oxygenText.text = "O2 WARNING " + roundedValue + "%";
+            }
+            else
+            {
+                oxygenText.text = "O2 " + roundedValue + "%";
+            }
+
+            oxygenText.color = oxygenColor;
         }
 
         if (oxygenFill != null)
         {
-            oxygenFill.fillAmount = Mathf.Clamp01(normalized);
-            oxygenFill.color = normalized < 0.25f ? new Color(1f, 0.2f, 0.12f) : new Color(0.05f, 0.95f, 0.8f);
+            oxygenFill.fillAmount = clamped;
+            oxygenFill.color = oxygenColor;
         }
+
+        UpdatePersistentWarning();
     }
 
     public void SetHealth(float normalized, float value)
     {
+        float clamped = Mathf.Clamp01(normalized);
+        int roundedValue = Mathf.CeilToInt(value);
+        healthCriticalActive = clamped < HealthCriticalThreshold;
+        Color healthColor = healthCriticalActive ? GetFlashingColor(criticalColor, Color.white, 0.75f) : healthNormalColor;
+
         if (healthText != null)
         {
-            healthText.text = "HEALTH " + Mathf.CeilToInt(value) + "/100";
+            healthText.text = healthCriticalActive ? "SUIT CRITICAL " + roundedValue + "/100" : "HEALTH " + roundedValue + "/100";
+            healthText.color = healthColor;
         }
 
         if (healthFill != null)
         {
-            healthFill.fillAmount = Mathf.Clamp01(normalized);
-            healthFill.color = normalized < 0.3f ? new Color(1f, 0.22f, 0.15f) : new Color(0.08f, 0.5f, 1f);
+            healthFill.fillAmount = clamped;
+            healthFill.color = healthColor;
         }
+
+        UpdatePersistentWarning();
     }
 
     public void SetBattery(float normalized, float value)
@@ -151,14 +206,20 @@ public class HUDController : MonoBehaviour
 
         int minutes = Mathf.FloorToInt(seconds / 60f);
         int secs = Mathf.FloorToInt(seconds % 60f);
-        timerText.text = "TIME " + minutes.ToString("00") + ":" + secs.ToString("00");
+        timeCriticalActive = seconds < TimerWarningSeconds;
+        timerText.text = (timeCriticalActive ? "TIME CRITICAL " : "TIME ") + minutes.ToString("00") + ":" + secs.ToString("00");
+        timerText.color = timeCriticalActive ? GetFlashingColor(timerWarningColor, Color.white, 0.65f) : timerNormalColor;
+        UpdatePersistentWarning();
     }
 
     public void SetTimerText(string value)
     {
         if (timerText != null)
         {
+            timeCriticalActive = false;
             timerText.text = value;
+            timerText.color = timerNormalColor;
+            UpdatePersistentWarning();
         }
     }
 
@@ -345,6 +406,41 @@ public class HUDController : MonoBehaviour
         }
 
         messageTimer = seconds;
+        if (messageTimer <= 0f)
+        {
+            UpdatePersistentWarning();
+        }
+    }
+
+    private Color GetFlashingColor(Color firstColor, Color secondColor, float speedMultiplier)
+    {
+        float pulse = Mathf.PingPong(Time.unscaledTime * WarningFlashSpeed * speedMultiplier, 1f);
+        return Color.Lerp(firstColor, secondColor, pulse);
+    }
+
+    private void UpdatePersistentWarning()
+    {
+        if (messageText == null || messageTimer > 0f)
+        {
+            return;
+        }
+
+        if (oxygenCriticalActive)
+        {
+            messageText.text = "OXYGEN CRITICAL - find O2 or repair Life Support";
+        }
+        else if (healthCriticalActive)
+        {
+            messageText.text = "SUIT CRITICAL - avoid robots and use medkit";
+        }
+        else if (timeCriticalActive)
+        {
+            messageText.text = "EVACUATION WINDOW CLOSING";
+        }
+        else
+        {
+            messageText.text = "";
+        }
     }
 
     public void ShowEndScreen(string title, string body, string recordBanner)
