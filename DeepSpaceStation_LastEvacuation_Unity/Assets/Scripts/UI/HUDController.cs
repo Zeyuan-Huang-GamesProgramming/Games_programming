@@ -23,6 +23,14 @@ public class HUDController : MonoBehaviour
     [SerializeField] private TMP_Text messageText;
     [SerializeField] private GameObject scanPanel;
     [SerializeField] private TMP_Text scanText;
+    [SerializeField] private GameObject mainMenuPanel;
+    [SerializeField] private TMP_Text mainMenuInfoText;
+    [SerializeField] private GameObject mainMenuPopupPanel;
+    [SerializeField] private TMP_Text mainMenuPopupTitleText;
+    [SerializeField] private TMP_Text mainMenuPopupBodyText;
+    [SerializeField] private GameObject mainMenuOptionsControls;
+    [SerializeField] private TMP_Text mainMenuVolumeValueText;
+    [SerializeField] private TMP_Text mainMenuMouseSensitivityValueText;
     [SerializeField] private GameObject modeSelectPanel;
     [SerializeField] private TMP_Text recordsText;
     [SerializeField] private GameObject briefingPanel;
@@ -57,6 +65,9 @@ public class HUDController : MonoBehaviour
     private readonly Color timerNormalColor = new Color(0.6f, 0.95f, 1f);
     private readonly Color timerWarningColor = new Color(1f, 0.22f, 0.12f);
 
+    public bool HasMainMenu => mainMenuPanel != null;
+    public bool IsMainMenuPopupOpen => mainMenuPopupPanel != null && mainMenuPopupPanel.activeSelf;
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -81,13 +92,15 @@ public class HUDController : MonoBehaviour
         SetBackpackOpen(false);
         SetScan(false, "");
         SetBriefingOpen(false);
+        CloseMainMenuPopup();
         RefreshSettingsText();
         SetPauseOpen(false);
     }
 
     private void Update()
     {
-        if (modeSelectPanel != null && modeSelectPanel.activeSelf)
+        if ((mainMenuPanel != null && mainMenuPanel.activeSelf)
+            || (modeSelectPanel != null && modeSelectPanel.activeSelf))
         {
             return;
         }
@@ -336,9 +349,19 @@ public class HUDController : MonoBehaviour
             volumeValueText.text = Mathf.RoundToInt(GameSettings.MasterVolume * 100f).ToString("00") + "%";
         }
 
+        if (mainMenuVolumeValueText != null)
+        {
+            mainMenuVolumeValueText.text = Mathf.RoundToInt(GameSettings.MasterVolume * 100f).ToString("00") + "%";
+        }
+
         if (mouseSensitivityValueText != null)
         {
             mouseSensitivityValueText.text = GameSettings.GetMouseSensitivity(2.2f).ToString("0.0");
+        }
+
+        if (mainMenuMouseSensitivityValueText != null)
+        {
+            mainMenuMouseSensitivityValueText.text = GameSettings.GetMouseSensitivity(2.2f).ToString("0.0");
         }
     }
 
@@ -347,6 +370,91 @@ public class HUDController : MonoBehaviour
         if (modeSelectPanel != null)
         {
             modeSelectPanel.SetActive(open);
+        }
+    }
+
+    public void SetMainMenuOpen(bool open)
+    {
+        if (mainMenuPanel != null)
+        {
+            mainMenuPanel.SetActive(open);
+        }
+    }
+
+    public void ShowMainMenuWelcome()
+    {
+        CloseMainMenuPopup();
+        SetMainMenuInfo(
+            "MISSION STATUS\n"
+            + "Station systems are offline.\n"
+            + "Oxygen reserve is unstable.\n"
+            + "Security robots are active.\n\n"
+            + "Select NEW GAME to begin evacuation protocol.");
+    }
+
+    public void ShowMainMenuOptions()
+    {
+        ShowMainMenuPopup(
+            "OPTIONS",
+            "Adjust mission settings before deployment.\nSettings are saved automatically.",
+            true);
+    }
+
+    public void ShowMainMenuHowToPlay()
+    {
+        ShowMainMenuPopup(
+            "HOW TO PLAY",
+            "WASD     Move\nMouse    Look around\nE        Interact\nTAB / I  Backpack\nQ        Scanner\nH        Use medkit\nB        Use battery\n\nRepair critical terminals, manage oxygen and suit health, avoid security robots, then reach the escape pod.",
+            false);
+    }
+
+    public void ShowMainMenuCredits()
+    {
+        ShowMainMenuPopup(
+            "CREDITS",
+            "Deep Space Station: Last Evacuation\nCreated by Zeyuan Huang\nBuilt with Unity 2022.3 LTS\n\nExternal free assets are documented in the GitHub repository credits and asset-use notes.",
+            false);
+    }
+
+    public void CloseMainMenuPopup()
+    {
+        SetMainMenuPopupOpen(false);
+    }
+
+    private void SetMainMenuInfo(string value)
+    {
+        if (mainMenuInfoText != null)
+        {
+            mainMenuInfoText.text = value;
+        }
+    }
+
+    private void ShowMainMenuPopup(string title, string body, bool showOptionsControls)
+    {
+        if (mainMenuPopupTitleText != null)
+        {
+            mainMenuPopupTitleText.text = title;
+        }
+
+        if (mainMenuPopupBodyText != null)
+        {
+            mainMenuPopupBodyText.text = body;
+        }
+
+        if (mainMenuOptionsControls != null)
+        {
+            mainMenuOptionsControls.SetActive(showOptionsControls);
+        }
+
+        RefreshSettingsText();
+        SetMainMenuPopupOpen(true);
+    }
+
+    private void SetMainMenuPopupOpen(bool open)
+    {
+        if (mainMenuPopupPanel != null)
+        {
+            mainMenuPopupPanel.SetActive(open);
         }
     }
 

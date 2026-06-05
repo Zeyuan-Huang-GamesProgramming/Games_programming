@@ -40,13 +40,14 @@ public class GameManager : MonoBehaviour
     private int detectionCount;
     private int endlessScore;
     private int endlessThreatLevel = 1;
+    private bool waitingForMainMenu = true;
     private bool waitingForModeSelection = true;
 
     public bool IsGameEnded { get; private set; }
     public bool IsPaused { get; private set; }
-    public bool IsChoosingMode => waitingForModeSelection;
-    public bool EndlessModeActive => !waitingForModeSelection && activeMode == GameMode.EndlessSurvival;
-    public bool TimedModeActive => !waitingForModeSelection && activeMode == GameMode.TimedEvacuation;
+    public bool IsChoosingMode => waitingForMainMenu || waitingForModeSelection;
+    public bool EndlessModeActive => !IsChoosingMode && activeMode == GameMode.EndlessSurvival;
+    public bool TimedModeActive => !IsChoosingMode && activeMode == GameMode.TimedEvacuation;
     public bool AllRepairsComplete => TimedModeActive && completedRepairs >= requiredRepairs;
     public int CompletedRepairs => completedRepairs;
     public int RequiredRepairs => requiredRepairs;
@@ -71,11 +72,47 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
+        ShowMainMenu();
+    }
+
+    private void ShowMainMenu()
+    {
+        if (HUDController.Instance == null || !HUDController.Instance.HasMainMenu)
+        {
+            ShowModeSelection();
+            return;
+        }
+
+        waitingForMainMenu = true;
+        waitingForModeSelection = false;
+        IsPaused = false;
+        Time.timeScale = 0f;
+        UnlockCursor();
+        UpdateObjectiveText();
+        HUDController.Instance?.SetRepairs(completedRepairs, requiredRepairs);
+        HUDController.Instance?.SetPressure(GlobalOxygenDrainMultiplier, stationInstability, false);
+        HUDController.Instance?.SetInventory("No items");
+        HUDController.Instance?.SetMainMenuOpen(true);
+        HUDController.Instance?.SetModeSelectionOpen(false);
+        HUDController.Instance?.SetRecordsSummary(BuildRecordSummary());
+        HUDController.Instance?.ShowMainMenuWelcome();
+        HUDController.Instance?.ShowMessage("", 0f);
+        GameAudio.Instance?.SetScannerActive(false);
+    }
+
+    public void OpenModeSelection()
+    {
         ShowModeSelection();
+    }
+
+    public void QuitGame()
+    {
+        Application.Quit();
     }
 
     private void ShowModeSelection()
     {
+        waitingForMainMenu = false;
         waitingForModeSelection = true;
         IsPaused = false;
         Time.timeScale = 0f;
@@ -84,6 +121,7 @@ public class GameManager : MonoBehaviour
         HUDController.Instance?.SetRepairs(completedRepairs, requiredRepairs);
         HUDController.Instance?.SetPressure(GlobalOxygenDrainMultiplier, stationInstability, false);
         HUDController.Instance?.SetInventory("No items");
+        HUDController.Instance?.SetMainMenuOpen(false);
         HUDController.Instance?.SetModeSelectionOpen(true);
         HUDController.Instance?.SetRecordsSummary(BuildRecordSummary());
         HUDController.Instance?.ShowMessage("", 0f);
@@ -92,8 +130,37 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
+        if (waitingForMainMenu)
+        {
+            HUDController.Instance?.SetMainMenuOpen(true);
+            HUDController.Instance?.SetModeSelectionOpen(false);
+            UnlockCursor();
+            bool popupOpen = HUDController.Instance != null && HUDController.Instance.IsMainMenuPopupOpen;
+            if (!popupOpen
+                && (Input.GetKeyDown(KeyCode.Return)
+                || Input.GetKeyDown(KeyCode.Space)
+                || Input.GetKeyDown(KeyCode.Alpha1)))
+            {
+                OpenModeSelection();
+            }
+            else if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                if (popupOpen)
+                {
+                    HUDController.Instance?.CloseMainMenuPopup();
+                }
+                else
+                {
+                    Application.Quit();
+                }
+            }
+
+            return;
+        }
+
         if (waitingForModeSelection)
         {
+            HUDController.Instance?.SetMainMenuOpen(false);
             HUDController.Instance?.SetModeSelectionOpen(true);
             UnlockCursor();
             if (Input.GetKeyDown(KeyCode.Alpha1))
@@ -168,12 +235,14 @@ public class GameManager : MonoBehaviour
     private void BeginMode(GameMode mode)
     {
         activeMode = mode;
+        waitingForMainMenu = false;
         waitingForModeSelection = false;
         IsPaused = false;
         Time.timeScale = 1f;
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
 
+        HUDController.Instance?.SetMainMenuOpen(false);
         HUDController.Instance?.SetModeSelectionOpen(false);
         GameAudio.Instance?.PlayMissionStart();
 
@@ -237,7 +306,7 @@ public class GameManager : MonoBehaviour
 
     public void RegisterRepair(string systemName)
     {
-        if (IsGameEnded || waitingForModeSelection)
+        if (IsGameEnded || IsChoosingMode)
         {
             return;
         }
@@ -358,7 +427,7 @@ public class GameManager : MonoBehaviour
 
     public void SetPaused(bool paused)
     {
-        if (IsGameEnded || waitingForModeSelection)
+        if (IsGameEnded || IsChoosingMode)
         {
             return;
         }
@@ -839,6 +908,12 @@ public class GameManager : MonoBehaviour
     {
         if (HUDController.Instance == null)
         {
+            return;
+        }
+
+        if (waitingForMainMenu)
+        {
+            HUDController.Instance.SetObjective("LAST EVACUATION\nPress Enter to open mission selection.");
             return;
         }
 

@@ -44,6 +44,7 @@ public static class DeepSpaceStationSceneBuilder
     private const string CosmicTablePath = "Assets/Cosmic_Retro_Station_Props_FREE/Prefabs/CR_Table_Small_2.prefab";
     private const string CosmicChairPath = "Assets/Cosmic_Retro_Station_Props_FREE/Prefabs/CR_Chair_Medium.prefab";
     private const string CosmicControlPanelPath = "Assets/Cosmic_Retro_Station_Props_FREE/Prefabs/CR_WallPanel_Control_2.prefab";
+    private const string MainMenuCoverPath = "Assets/UI/Menu/main-menu-cover.png";
     private const string SciFiFontPath = "Assets/Fonts/Teko-Bold.ttf";
     private const string SciFiFontAssetPath = "Assets/Fonts/Teko-Bold SDF.asset";
     private const string TmpSettingsPath = "Assets/TextMesh Pro/Resources/TMP Settings.asset";
@@ -663,6 +664,25 @@ public static class DeepSpaceStationSceneBuilder
         SetObject(hud, "messageText", FindTMPText(hud.transform, "MessageText"));
         SetObject(hud, "scanText", FindTMPText(hud.transform, "ScanText"));
         SetObject(hud, "recordsText", FindTMPText(hud.transform, "RecordsText"));
+        SetObject(hud, "mainMenuInfoText", FindTMPText(hud.transform, "MainMenuInfoText"));
+        SetObject(hud, "mainMenuPopupTitleText", FindTMPText(hud.transform, "MainMenuPopupTitle"));
+        SetObject(hud, "mainMenuPopupBodyText", FindTMPText(hud.transform, "MainMenuPopupBody"));
+        SetObject(hud, "mainMenuVolumeValueText", FindTMPText(hud.transform, "MainMenuVolumeValueText"));
+        SetObject(hud, "mainMenuMouseSensitivityValueText", FindTMPText(hud.transform, "MainMenuMouseSensitivityValueText"));
+        Transform mainMenuPanel = FindChild(hud.transform, "MainMenuPanel");
+        Transform mainMenuPopupPanel = FindChild(hud.transform, "MainMenuPopupPanel");
+        Transform mainMenuOptionsControls = FindChild(hud.transform, "MainMenuOptionsControls");
+        Transform modeSelectPanel = FindChild(hud.transform, "ModeSelectPanel");
+        Transform briefingPanel = FindChild(hud.transform, "BriefingPanel");
+        Transform pausePanel = FindChild(hud.transform, "PausePanel");
+        Transform endPanel = FindChild(hud.transform, "EndPanel");
+        SetObject(hud, "mainMenuPanel", mainMenuPanel == null ? null : mainMenuPanel.gameObject);
+        SetObject(hud, "mainMenuPopupPanel", mainMenuPopupPanel == null ? null : mainMenuPopupPanel.gameObject);
+        SetObject(hud, "mainMenuOptionsControls", mainMenuOptionsControls == null ? null : mainMenuOptionsControls.gameObject);
+        SetObject(hud, "modeSelectPanel", modeSelectPanel == null ? null : modeSelectPanel.gameObject);
+        SetObject(hud, "briefingPanel", briefingPanel == null ? null : briefingPanel.gameObject);
+        SetObject(hud, "pausePanel", pausePanel == null ? null : pausePanel.gameObject);
+        SetObject(hud, "endPanel", endPanel == null ? null : endPanel.gameObject);
         SetObject(hud, "briefingTitleText", FindTMPText(hud.transform, "BriefingTitle"));
         SetObject(hud, "briefingBodyText", FindTMPText(hud.transform, "BriefingBody"));
         SetObject(hud, "volumeValueText", FindTMPText(hud.transform, "VolumeValueText"));
@@ -729,6 +749,10 @@ public static class DeepSpaceStationSceneBuilder
         TintImage(root, "BackpackPanel", modal);
         TintImage(root, "PausePanel", modal);
         TintImage(root, "EndPanel", overlay);
+        TintImage(root, "MainMenuCommandCard", new Color(0.008f, 0.027f, 0.055f, 0.72f));
+        TintImage(root, "MainMenuInfoPanel", new Color(0.008f, 0.027f, 0.055f, 0.7f));
+        TintImage(root, "MainMenuPopupPanel", new Color(0.008f, 0.027f, 0.055f, 0.92f));
+        TintImage(root, "MainMenuOptionsControls", new Color(0.012f, 0.045f, 0.082f, 0.72f));
         TintImage(root, "ModeSelectPanel", overlay);
         TintImage(root, "ModeSelectCard", modal);
         TintImage(root, "BriefingPanel", modal);
@@ -737,6 +761,9 @@ public static class DeepSpaceStationSceneBuilder
         AddPanelAccent(root, "StatusPanel", accent);
         AddPanelAccent(root, "BackpackPanel", accent);
         AddPanelAccent(root, "PausePanel", accent);
+        AddPanelAccent(root, "MainMenuCommandCard", accent);
+        AddPanelAccent(root, "MainMenuInfoPanel", accent);
+        AddPanelAccent(root, "MainMenuPopupPanel", accent);
         AddPanelAccent(root, "ModeSelectCard", accent);
         AddPanelAccent(root, "BriefingPanel", accent);
 
@@ -774,6 +801,23 @@ public static class DeepSpaceStationSceneBuilder
         StyleHUDText(root, "PauseSettingsHint", font, secondary, 17f, FontStyles.Normal, 1.5f);
         StyleHUDText(root, "EndTitle", font, accent, 52f, FontStyles.Bold, 3.5f);
         StyleHUDText(root, "EndBody", font, primary, 27f, FontStyles.Normal, 2f);
+        StyleHUDText(root, "MainMenuHeader", font, accent, 34f, FontStyles.Bold, 2.8f);
+        StyleHUDText(root, "MainMenuPrototype", font, secondary, 17f, FontStyles.Bold, 2.4f);
+        StyleHUDText(root, "MainMenuTitle", font, accent, 27f, FontStyles.Bold, 2.6f);
+        StyleHUDText(root, "MainMenuSubtitle", font, primary, 39f, FontStyles.Bold, 3f);
+        StyleHUDText(root, "MainMenuInfoText", font, primary, 18f, FontStyles.Normal, 1.7f);
+        StyleHUDText(root, "MainMenuHint", font, secondary, 14f, FontStyles.Bold, 1.8f);
+        StyleHUDText(root, "MainMenuPopupTitle", font, accent, 31f, FontStyles.Bold, 3f);
+        StyleHUDText(root, "MainMenuPopupBody", font, primary, 20f, FontStyles.Normal, 1.8f);
+        StyleHUDText(root, "MainMenuVolumeLabel", font, primary, 18f, FontStyles.Bold, 1.6f);
+        StyleHUDText(root, "MainMenuVolumeValueText", font, warning, 20f, FontStyles.Bold, 1.8f);
+        StyleHUDText(root, "MainMenuMouseSensitivityLabel", font, primary, 18f, FontStyles.Bold, 1.6f);
+        StyleHUDText(root, "MainMenuMouseSensitivityValueText", font, warning, 20f, FontStyles.Bold, 1.8f);
+        StyleHUDText(root, "MainMenuBackButtonLabel", font, Color.white, 18f, FontStyles.Bold, 1.8f);
+        StyleHUDText(root, "MainMenuVolumeDownButtonLabel", font, Color.white, 22f, FontStyles.Bold, 1.5f);
+        StyleHUDText(root, "MainMenuVolumeUpButtonLabel", font, Color.white, 22f, FontStyles.Bold, 1.5f);
+        StyleHUDText(root, "MainMenuSensitivityDownButtonLabel", font, Color.white, 22f, FontStyles.Bold, 1.5f);
+        StyleHUDText(root, "MainMenuSensitivityUpButtonLabel", font, Color.white, 22f, FontStyles.Bold, 1.5f);
         StyleHUDText(root, "ModeTitle", font, accent, 50f, FontStyles.Bold, 3.5f);
         StyleHUDText(root, "ModeSubtitle", font, primary, 30f, FontStyles.Normal, 2.8f);
         StyleHUDText(root, "ModeBody", font, secondary, 21f, FontStyles.Normal, 2f);
@@ -784,6 +828,11 @@ public static class DeepSpaceStationSceneBuilder
         StyleHUDText(root, "BriefingBody", font, primary, 23f, FontStyles.Normal, 2f);
         StyleHUDText(root, "EndRecordText", font, warning, 30f, FontStyles.Bold, 2.8f);
         StyleHUDText(root, "EndHintText", font, secondary, 22f, FontStyles.Bold, 2.2f);
+        StyleHUDText(root, "NewGameButtonLabel", font, Color.white, 24f, FontStyles.Bold, 2f);
+        StyleHUDText(root, "OptionsButtonLabel", font, primary, 22f, FontStyles.Bold, 1.8f);
+        StyleHUDText(root, "HowToPlayButtonLabel", font, primary, 22f, FontStyles.Bold, 1.8f);
+        StyleHUDText(root, "CreditsButtonLabel", font, primary, 22f, FontStyles.Bold, 1.8f);
+        StyleHUDText(root, "QuitButtonLabel", font, primary, 22f, FontStyles.Bold, 1.8f);
         StyleHUDText(root, "TimedEvacuationButtonTitle", font, Color.white, 27f, FontStyles.Bold, 2f);
         StyleHUDText(root, "TimedEvacuationButtonSubtitle", font, primary, 17f, FontStyles.Normal, 1.5f);
         StyleHUDText(root, "EndlessSurvivalButtonTitle", font, Color.white, 27f, FontStyles.Bold, 2f);
@@ -791,14 +840,161 @@ public static class DeepSpaceStationSceneBuilder
 
         StyleButton(root, "TimedEvacuationButton", new Color(0.035f, 0.42f, 0.62f, 0.96f));
         StyleButton(root, "EndlessSurvivalButton", new Color(0.025f, 0.29f, 0.43f, 0.96f));
+        StyleButton(root, "MainMenuBackButton", new Color(0.035f, 0.42f, 0.72f, 0.96f));
+        StyleButton(root, "MainMenuVolumeDownButton", new Color(0.025f, 0.29f, 0.43f, 0.96f));
+        StyleButton(root, "MainMenuVolumeUpButton", new Color(0.035f, 0.42f, 0.62f, 0.96f));
+        StyleButton(root, "MainMenuSensitivityDownButton", new Color(0.025f, 0.29f, 0.43f, 0.96f));
+        StyleButton(root, "MainMenuSensitivityUpButton", new Color(0.035f, 0.42f, 0.62f, 0.96f));
         StyleButton(root, "VolumeDownButton", new Color(0.025f, 0.29f, 0.43f, 0.96f));
         StyleButton(root, "VolumeUpButton", new Color(0.035f, 0.42f, 0.62f, 0.96f));
         StyleButton(root, "SensitivityDownButton", new Color(0.025f, 0.29f, 0.43f, 0.96f));
         StyleButton(root, "SensitivityUpButton", new Color(0.035f, 0.42f, 0.62f, 0.96f));
     }
 
+    private static void EnsureMainMenuWidgets(HUDController hud, TMP_FontAsset font)
+    {
+        Transform root = hud.transform;
+        Transform mainMenuPanel = FindChild(root, "MainMenuPanel");
+
+        if (mainMenuPanel == null)
+        {
+            GameObject created = CreateMainMenuPanel(
+                root,
+                font,
+                new Color(0.02f, 0.42f, 0.88f),
+                new Color(0.08f, 0.14f, 0.22f));
+            mainMenuPanel = created.transform;
+        }
+        else
+        {
+            Image mainMenuImage = mainMenuPanel.GetComponent<Image>();
+            Sprite coverSprite = LoadMainMenuCoverSprite();
+            if (mainMenuImage != null && coverSprite != null)
+            {
+                mainMenuImage.sprite = coverSprite;
+                mainMenuImage.color = Color.white;
+                mainMenuImage.type = Image.Type.Simple;
+                mainMenuImage.preserveAspect = false;
+            }
+
+            for (int i = mainMenuPanel.childCount - 1; i >= 0; i--)
+            {
+                Object.DestroyImmediate(mainMenuPanel.GetChild(i).gameObject);
+            }
+
+            BuildMainMenuContent(mainMenuPanel.transform, font, new Color(0.02f, 0.42f, 0.88f), new Color(0.08f, 0.14f, 0.22f));
+        }
+
+        GameManager manager = Object.FindObjectOfType<GameManager>();
+        if (manager != null)
+        {
+            EnsureButtonListener(mainMenuPanel, "NewGameButton", new UnityEngine.Events.UnityAction(manager.OpenModeSelection));
+            EnsureButtonListener(mainMenuPanel, "QuitButton", new UnityEngine.Events.UnityAction(manager.QuitGame));
+        }
+
+        EnsureMainMenuPopupWidgets(hud, mainMenuPanel, font);
+        EnsureButtonListener(mainMenuPanel, "OptionsButton", new UnityEngine.Events.UnityAction(hud.ShowMainMenuOptions));
+        EnsureButtonListener(mainMenuPanel, "HowToPlayButton", new UnityEngine.Events.UnityAction(hud.ShowMainMenuHowToPlay));
+        EnsureButtonListener(mainMenuPanel, "CreditsButton", new UnityEngine.Events.UnityAction(hud.ShowMainMenuCredits));
+        EnsureButtonListener(mainMenuPanel, "MainMenuBackButton", new UnityEngine.Events.UnityAction(hud.CloseMainMenuPopup));
+        EnsureButtonListener(mainMenuPanel, "MainMenuVolumeDownButton", new UnityEngine.Events.UnityAction(hud.DecreaseMasterVolume));
+        EnsureButtonListener(mainMenuPanel, "MainMenuVolumeUpButton", new UnityEngine.Events.UnityAction(hud.IncreaseMasterVolume));
+        EnsureButtonListener(mainMenuPanel, "MainMenuSensitivityDownButton", new UnityEngine.Events.UnityAction(hud.DecreaseMouseSensitivity));
+        EnsureButtonListener(mainMenuPanel, "MainMenuSensitivityUpButton", new UnityEngine.Events.UnityAction(hud.IncreaseMouseSensitivity));
+
+        Transform modeSelectPanel = FindChild(root, "ModeSelectPanel");
+        if (modeSelectPanel != null)
+        {
+            modeSelectPanel.gameObject.SetActive(false);
+            SetObject(hud, "modeSelectPanel", modeSelectPanel.gameObject);
+        }
+
+        mainMenuPanel.gameObject.SetActive(true);
+        SetObject(hud, "mainMenuPanel", mainMenuPanel.gameObject);
+        SetObject(hud, "mainMenuInfoText", null);
+    }
+
+    private static void EnsureMainMenuPopupWidgets(HUDController hud, Transform mainMenuPanel, TMP_FontAsset font)
+    {
+        Transform popup = FindChild(mainMenuPanel, "MainMenuPopupPanel");
+        if (popup != null && FindChild(popup, "MainMenuBackButton") == null)
+        {
+            Object.DestroyImmediate(popup.gameObject);
+            popup = null;
+        }
+
+        if (popup == null)
+        {
+            popup = Panel(mainMenuPanel, "MainMenuPopupPanel", new Vector2(-54f, -116f), new Vector2(382f, 342f), new Color(0.008f, 0.027f, 0.055f, 0.92f)).transform;
+            TMP_Text title = TextUI(popup, "MainMenuPopupTitle", "OPTIONS", new Vector2(22f, -20f), TextAlignmentOptions.TopLeft, 31, font);
+            title.color = new Color(0.08f, 0.82f, 1f);
+            title.fontStyle = FontStyles.Bold;
+            title.enableWordWrapping = false;
+            title.GetComponent<RectTransform>().sizeDelta = new Vector2(330f, 42f);
+
+            TMP_Text body = TextUI(popup, "MainMenuPopupBody", "", new Vector2(22f, -70f), TextAlignmentOptions.TopLeft, 20, font);
+            body.color = new Color(0.78f, 0.92f, 1f);
+            body.GetComponent<RectTransform>().sizeDelta = new Vector2(336f, 148f);
+
+            GameObject controls = TopLeftPanel(popup, "MainMenuOptionsControls", new Vector2(20f, -204f), new Vector2(342f, 84f), new Color(0.012f, 0.045f, 0.082f, 0.72f));
+            TMP_Text volumeLabel = TextUI(controls.transform, "MainMenuVolumeLabel", "MASTER VOLUME", new Vector2(12f, -9f), TextAlignmentOptions.TopLeft, 18, font);
+            volumeLabel.color = new Color(0.78f, 0.92f, 1f);
+            volumeLabel.fontStyle = FontStyles.Bold;
+            volumeLabel.enableWordWrapping = false;
+            volumeLabel.GetComponent<RectTransform>().sizeDelta = new Vector2(150f, 28f);
+            TMP_Text volumeValue = TextUI(controls.transform, "MainMenuVolumeValueText", "80%", new Vector2(178f, -9f), TextAlignmentOptions.TopLeft, 20, font);
+            volumeValue.color = new Color(1f, 0.69f, 0.2f);
+            volumeValue.fontStyle = FontStyles.Bold;
+            volumeValue.enableWordWrapping = false;
+            volumeValue.GetComponent<RectTransform>().sizeDelta = new Vector2(58f, 28f);
+            TMP_Text sensitivityLabel = TextUI(controls.transform, "MainMenuMouseSensitivityLabel", "LOOK SENSITIVITY", new Vector2(12f, -48f), TextAlignmentOptions.TopLeft, 18, font);
+            sensitivityLabel.color = new Color(0.78f, 0.92f, 1f);
+            sensitivityLabel.fontStyle = FontStyles.Bold;
+            sensitivityLabel.enableWordWrapping = false;
+            sensitivityLabel.GetComponent<RectTransform>().sizeDelta = new Vector2(170f, 28f);
+            TMP_Text sensitivityValue = TextUI(controls.transform, "MainMenuMouseSensitivityValueText", "2.2", new Vector2(178f, -48f), TextAlignmentOptions.TopLeft, 20, font);
+            sensitivityValue.color = new Color(1f, 0.69f, 0.2f);
+            sensitivityValue.fontStyle = FontStyles.Bold;
+            sensitivityValue.enableWordWrapping = false;
+            sensitivityValue.GetComponent<RectTransform>().sizeDelta = new Vector2(58f, 28f);
+
+            MainMenuPopupButton(controls.transform, "MainMenuVolumeDownButton", "-", new Vector2(246f, -6f), new Vector2(34f, 28f), font);
+            MainMenuPopupButton(controls.transform, "MainMenuVolumeUpButton", "+", new Vector2(292f, -6f), new Vector2(34f, 28f), font);
+            MainMenuPopupButton(controls.transform, "MainMenuSensitivityDownButton", "-", new Vector2(246f, -45f), new Vector2(34f, 28f), font);
+            MainMenuPopupButton(controls.transform, "MainMenuSensitivityUpButton", "+", new Vector2(292f, -45f), new Vector2(34f, 28f), font);
+            MainMenuPopupButton(popup, "MainMenuBackButton", "BACK", new Vector2(246f, -294f), new Vector2(98f, 34f), font);
+            controls.SetActive(false);
+            popup.gameObject.SetActive(false);
+        }
+
+        SetObject(hud, "mainMenuPopupPanel", popup.gameObject);
+        SetObject(hud, "mainMenuPopupTitleText", FindTMPText(popup, "MainMenuPopupTitle"));
+        SetObject(hud, "mainMenuPopupBodyText", FindTMPText(popup, "MainMenuPopupBody"));
+        Transform optionsControls = FindChild(popup, "MainMenuOptionsControls");
+        SetObject(hud, "mainMenuOptionsControls", optionsControls == null ? null : optionsControls.gameObject);
+        SetObject(hud, "mainMenuVolumeValueText", FindTMPText(popup, "MainMenuVolumeValueText"));
+        SetObject(hud, "mainMenuMouseSensitivityValueText", FindTMPText(popup, "MainMenuMouseSensitivityValueText"));
+    }
+
+    private static void EnsureButtonListener(Transform root, string objectName, UnityEngine.Events.UnityAction callback)
+    {
+        Transform child = FindChild(root, objectName);
+        if (child == null)
+        {
+            return;
+        }
+
+        Button button = child.GetComponent<Button>();
+        if (button != null && button.onClick.GetPersistentEventCount() == 0)
+        {
+            UnityEventTools.AddPersistentListener(button.onClick, callback);
+        }
+    }
+
     private static void EnsurePresentationWidgets(HUDController hud, TMP_FontAsset font)
     {
+        EnsureMainMenuWidgets(hud, font);
+
         Transform root = hud.transform;
         Transform modeCard = FindChild(root, "ModeSelectCard");
         if (modeCard != null)
@@ -2254,6 +2450,8 @@ public static class DeepSpaceStationSceneBuilder
         endBody.GetComponent<RectTransform>().sizeDelta = new Vector2(620f, 360f);
         panel.SetActive(false);
 
+        GameObject mainMenuPanel = CreateMainMenuPanel(canvasObject.transform, font, uiBlue, uiInk);
+
         GameObject modePanel = StretchPanel(canvasObject.transform, "ModeSelectPanel", new Color(0.01f, 0.04f, 0.07f, 0.92f));
         GameObject modeCard = CenterPanel(modePanel.transform, "ModeSelectCard", new Vector2(720f, 470f), new Color(0.93f, 0.97f, 1f, 0.96f));
         TMP_Text modeTitle = TextUI(modeCard.transform, "ModeTitle", "DEEP SPACE STATION", new Vector2(0f, 170f), TextAlignmentOptions.Center, 50, font);
@@ -2267,6 +2465,8 @@ public static class DeepSpaceStationSceneBuilder
         Button endlessButton = ModeButton(modeCard.transform, "EndlessSurvivalButton", "2  ENDLESS SURVIVAL", "Keep repairing terminals for score. Robot threat rises as you score.", new Vector2(0f, -98f), new Color(0.03f, 0.58f, 0.72f), uiInk, font);
         TMP_Text modeHint = TextUI(modeCard.transform, "ModeHint", "CLICK A MODE OR PRESS 1 / 2", new Vector2(0f, -190f), TextAlignmentOptions.Center, 22, font);
         modeHint.color = uiBlue;
+        mainMenuPanel.SetActive(true);
+        modePanel.SetActive(false);
 
         GameManager manager = Object.FindObjectOfType<GameManager>();
         if (manager != null)
@@ -2293,6 +2493,8 @@ public static class DeepSpaceStationSceneBuilder
         SetObject(hud, "messageText", message);
         SetObject(hud, "scanPanel", scanPanel);
         SetObject(hud, "scanText", scanText);
+        SetObject(hud, "mainMenuPanel", mainMenuPanel);
+        SetObject(hud, "mainMenuInfoText", FindTMPText(mainMenuPanel.transform, "MainMenuInfoText"));
         SetObject(hud, "modeSelectPanel", modePanel);
         SetObject(hud, "pausePanel", pausePanel);
         SetObject(hud, "endPanel", panel);
@@ -2300,6 +2502,110 @@ public static class DeepSpaceStationSceneBuilder
         SetObject(hud, "endBodyText", endBody);
         EnsurePresentationWidgets(hud, font);
         ApplyHUDPolish(canvasObject.transform, font);
+    }
+
+    private static GameObject CreateMainMenuPanel(Transform parent, TMP_FontAsset font, Color uiBlue, Color uiInk)
+    {
+        GameObject mainMenuPanel = StretchPanel(parent, "MainMenuPanel", new Color(0.01f, 0.03f, 0.06f, 1f));
+        mainMenuPanel.transform.SetAsLastSibling();
+        Image mainMenuImage = mainMenuPanel.GetComponent<Image>();
+        Sprite coverSprite = LoadMainMenuCoverSprite();
+        if (coverSprite != null)
+        {
+            mainMenuImage.sprite = coverSprite;
+            mainMenuImage.color = Color.white;
+            mainMenuImage.type = Image.Type.Simple;
+            mainMenuImage.preserveAspect = false;
+        }
+
+        BuildMainMenuContent(mainMenuPanel.transform, font, uiBlue, uiInk);
+        return mainMenuPanel;
+    }
+
+    private static void BuildMainMenuContent(Transform mainMenuPanel, TMP_FontAsset font, Color uiBlue, Color uiInk)
+    {
+        MainMenuButton(mainMenuPanel, "NewGameButton", new Vector2(52f, -150f), new Vector2(278f, 32f));
+        MainMenuButton(mainMenuPanel, "OptionsButton", new Vector2(52f, -186f), new Vector2(278f, 32f));
+        MainMenuButton(mainMenuPanel, "HowToPlayButton", new Vector2(52f, -222f), new Vector2(278f, 32f));
+        MainMenuButton(mainMenuPanel, "CreditsButton", new Vector2(52f, -257f), new Vector2(278f, 32f));
+        MainMenuButton(mainMenuPanel, "QuitButton", new Vector2(52f, -292f), new Vector2(278f, 32f));
+    }
+
+    private static Sprite LoadMainMenuCoverSprite()
+    {
+        if (!File.Exists(MainMenuCoverPath))
+        {
+            return null;
+        }
+
+        AssetDatabase.ImportAsset(MainMenuCoverPath, ImportAssetOptions.ForceSynchronousImport);
+        TextureImporter importer = AssetImporter.GetAtPath(MainMenuCoverPath) as TextureImporter;
+        if (importer != null && importer.textureType != TextureImporterType.Sprite)
+        {
+            importer.textureType = TextureImporterType.Sprite;
+            importer.spriteImportMode = SpriteImportMode.Single;
+            importer.alphaSource = TextureImporterAlphaSource.None;
+            importer.mipmapEnabled = false;
+            importer.SaveAndReimport();
+        }
+
+        return AssetDatabase.LoadAssetAtPath<Sprite>(MainMenuCoverPath);
+    }
+
+    private static Button MainMenuButton(Transform parent, string name, Vector2 position, Vector2 size)
+    {
+        GameObject buttonObject = new GameObject(name, typeof(RectTransform));
+        buttonObject.transform.SetParent(parent, false);
+        Image image = buttonObject.AddComponent<Image>();
+        image.color = new Color(0f, 0f, 0f, 0f);
+        Button button = buttonObject.AddComponent<Button>();
+        ColorBlock colors = button.colors;
+        colors.normalColor = new Color(0f, 0f, 0f, 0f);
+        colors.highlightedColor = new Color(0.08f, 0.55f, 1f, 0.12f);
+        colors.pressedColor = new Color(0.08f, 0.55f, 1f, 0.2f);
+        colors.selectedColor = colors.highlightedColor;
+        colors.colorMultiplier = 1f;
+        colors.fadeDuration = 0.08f;
+        button.colors = colors;
+
+        RectTransform rect = buttonObject.GetComponent<RectTransform>();
+        rect.anchorMin = new Vector2(0f, 1f);
+        rect.anchorMax = new Vector2(0f, 1f);
+        rect.pivot = new Vector2(0f, 1f);
+        rect.anchoredPosition = position;
+        rect.sizeDelta = size;
+        return button;
+    }
+
+    private static Button MainMenuPopupButton(Transform parent, string name, string label, Vector2 position, Vector2 size, TMP_FontAsset font)
+    {
+        GameObject buttonObject = new GameObject(name, typeof(RectTransform));
+        buttonObject.transform.SetParent(parent, false);
+        Image image = buttonObject.AddComponent<Image>();
+        image.color = new Color(0.035f, 0.42f, 0.62f, 0.96f);
+        Button button = buttonObject.AddComponent<Button>();
+        ColorBlock colors = button.colors;
+        colors.normalColor = image.color;
+        colors.highlightedColor = Color.Lerp(image.color, Color.white, 0.18f);
+        colors.pressedColor = Color.Lerp(image.color, Color.black, 0.2f);
+        colors.selectedColor = colors.highlightedColor;
+        colors.colorMultiplier = 1f;
+        colors.fadeDuration = 0.08f;
+        button.colors = colors;
+
+        RectTransform rect = buttonObject.GetComponent<RectTransform>();
+        rect.anchorMin = new Vector2(0f, 1f);
+        rect.anchorMax = new Vector2(0f, 1f);
+        rect.pivot = new Vector2(0f, 1f);
+        rect.anchoredPosition = position;
+        rect.sizeDelta = size;
+
+        TMP_Text text = TextUI(buttonObject.transform, name + "Label", label, Vector2.zero, TextAlignmentOptions.Center, label.Length <= 1 ? 22 : 18, font);
+        text.color = Color.white;
+        text.fontStyle = FontStyles.Bold;
+        text.enableWordWrapping = false;
+        text.GetComponent<RectTransform>().sizeDelta = size;
+        return button;
     }
 
     private static GameObject WorldLabel(string text, Vector3 position, Vector3 lookAt, Color color, float scale)
