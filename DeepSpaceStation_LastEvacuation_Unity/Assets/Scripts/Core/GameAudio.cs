@@ -5,16 +5,20 @@ using UnityEngine;
 public class GameAudio : MonoBehaviour
 {
     private const int SampleRate = 44100;
+    private const string BackgroundMusicResourcePath = "Audio/Music/TenseFutureLoop";
 
     public static GameAudio Instance { get; private set; }
 
     [SerializeField, Range(0f, 1f)] private float masterVolume = 0.8f;
     [SerializeField, Range(0f, 1f)] private float ambienceVolume = 0.18f;
+    [SerializeField, Range(0f, 1f)] private float musicVolume = 0.75f;
 
     private AudioSource ambienceSource;
+    private AudioSource musicSource;
     private AudioSource effectsSource;
     private AudioSource scannerSource;
     private AudioClip ambienceLoop;
+    private AudioClip musicLoop;
     private AudioClip scannerLoop;
     private AudioClip doorOpenClip;
     private AudioClip deniedClip;
@@ -33,6 +37,8 @@ public class GameAudio : MonoBehaviour
     private AudioClip victoryClip;
     private AudioClip failureClip;
     private float nextOxygenWarningTime;
+    private bool musicLoadLogged;
+    private bool musicMissingLogged;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     private static void Bootstrap()
@@ -58,13 +64,28 @@ public class GameAudio : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject);
         ambienceSource = AddSource(true, ambienceVolume);
+        musicSource = AddSource(true, musicVolume);
         effectsSource = AddSource(false, 1f);
         scannerSource = AddSource(true, 0.11f);
         BuildProceduralClips();
 
         ambienceSource.clip = ambienceLoop;
         ambienceSource.Play();
+        EnsureMusicPlaying();
+
         scannerSource.clip = scannerLoop;
+    }
+
+    private void Start()
+    {
+        EnsureMusicPlaying();
+    }
+
+    private void Update()
+    {
+        masterVolume = GameSettings.MasterVolume;
+        ApplySourceVolumes();
+        EnsureMusicPlaying();
     }
 
     public void SetScannerActive(bool active)
@@ -119,8 +140,69 @@ public class GameAudio : MonoBehaviour
         source.playOnAwake = false;
         source.loop = loop;
         source.spatialBlend = 0f;
+        source.ignoreListenerPause = true;
         source.volume = volume * masterVolume;
         return source;
+    }
+
+    private void ApplySourceVolumes()
+    {
+        if (ambienceSource != null)
+        {
+            ambienceSource.volume = ambienceVolume * masterVolume;
+        }
+
+        if (musicSource != null)
+        {
+            musicSource.volume = musicVolume * masterVolume;
+        }
+
+        if (scannerSource != null)
+        {
+            scannerSource.volume = 0.11f * masterVolume;
+        }
+    }
+
+    private void EnsureMusicPlaying()
+    {
+        if (musicSource == null)
+        {
+            return;
+        }
+
+        if (musicLoop == null)
+        {
+            musicLoop = LoadBackgroundMusicClip();
+            if (musicLoop == null)
+            {
+                if (!musicMissingLogged)
+                {
+                    Debug.LogWarning("Deep Space Station BGM could not be loaded from Resources/" + BackgroundMusicResourcePath + ".");
+                    musicMissingLogged = true;
+                }
+
+                return;
+            }
+        }
+
+        if (musicSource.clip != musicLoop)
+        {
+            musicSource.clip = musicLoop;
+        }
+
+        musicSource.loop = true;
+        musicSource.volume = musicVolume * masterVolume;
+        if (!musicSource.isPlaying)
+        {
+            musicSource.Play();
+        }
+
+        if (!musicLoadLogged)
+        {
+            Debug.Log("Deep Space Station BGM playing: " + musicLoop.name + " | volume " + musicSource.volume.ToString("0.00"));
+            musicLoadLogged = true;
+            musicMissingLogged = false;
+        }
     }
 
     private void Play(AudioClip clip, float volume)
@@ -138,6 +220,8 @@ public class GameAudio : MonoBehaviour
             + Mathf.Sin(2f * Mathf.PI * 55f * t) * 0.1f
             + Mathf.Sin(2f * Mathf.PI * 110f * t) * 0.025f
             + Mathf.Sin(2f * Mathf.PI * 83f * t) * 0.012f);
+
+        musicLoop = LoadBackgroundMusicClip();
 
         scannerLoop = CreateLoop("Scanner Sweep", 1f, t =>
         {
@@ -200,6 +284,23 @@ public class GameAudio : MonoBehaviour
             float frequency = Mathf.Lerp(196f, 73f, t / 1.7f);
             return (Mathf.Sin(2f * Mathf.PI * frequency * t) + Mathf.Sin(2f * Mathf.PI * frequency * 0.5f * t)) * 0.25f;
         });
+    }
+
+    private static AudioClip LoadBackgroundMusicClip()
+    {
+        AudioClip clip = Resources.Load<AudioClip>(BackgroundMusicResourcePath);
+        if (clip != null)
+        {
+            return clip;
+        }
+
+        AudioClip[] musicClips = Resources.LoadAll<AudioClip>("Audio/Music");
+        if (musicClips != null && musicClips.Length > 0)
+        {
+            return musicClips[0];
+        }
+
+        return null;
     }
 
     private static AudioClip CreateLoop(string clipName, float duration, Func<float, float> wave)

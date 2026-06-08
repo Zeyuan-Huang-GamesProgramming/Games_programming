@@ -18,9 +18,9 @@ public static class DeepSpaceStationSceneBuilder
     private const float StationCeilingY = 4.32f;
     private const float StationWallHeight = 4.2f;
     private const float SideDoorWidth = 3.8f;
-    private const bool UseFullImportedCorridorShells = false;
+    private static readonly bool UseFullImportedCorridorShells = false;
     private const float ImportedModuleY = 1f;
-    private const bool UseImportedEnvironmentVisuals = true;
+    private static readonly bool UseImportedEnvironmentVisuals = true;
     private const string ImportedSkyboxPath = "Assets/Free Skyboxes - Space/SBS Space 1/Large/Skybox_Space 1 Large.mat";
     private const string ModularCorridorPath = "Assets/Sci Fi Modular Pack/Prefabs/Starter/Profile1.prefab";
     private const string ModularDoorProfilePath = "Assets/Sci Fi Modular Pack/Prefabs/Starter/ProfileDoor.prefab";
@@ -832,7 +832,6 @@ public static class DeepSpaceStationSceneBuilder
         StyleHUDText(root, "OptionsButtonLabel", font, primary, 22f, FontStyles.Bold, 1.8f);
         StyleHUDText(root, "HowToPlayButtonLabel", font, primary, 22f, FontStyles.Bold, 1.8f);
         StyleHUDText(root, "CreditsButtonLabel", font, primary, 22f, FontStyles.Bold, 1.8f);
-        StyleHUDText(root, "QuitButtonLabel", font, primary, 22f, FontStyles.Bold, 1.8f);
         StyleHUDText(root, "TimedEvacuationButtonTitle", font, Color.white, 27f, FontStyles.Bold, 2f);
         StyleHUDText(root, "TimedEvacuationButtonSubtitle", font, primary, 17f, FontStyles.Normal, 1.5f);
         StyleHUDText(root, "EndlessSurvivalButtonTitle", font, Color.white, 27f, FontStyles.Bold, 2f);
@@ -889,7 +888,6 @@ public static class DeepSpaceStationSceneBuilder
         if (manager != null)
         {
             EnsureButtonListener(mainMenuPanel, "NewGameButton", new UnityEngine.Events.UnityAction(manager.OpenModeSelection));
-            EnsureButtonListener(mainMenuPanel, "QuitButton", new UnityEngine.Events.UnityAction(manager.QuitGame));
         }
 
         EnsureMainMenuPopupWidgets(hud, mainMenuPanel, font);
@@ -2528,7 +2526,6 @@ public static class DeepSpaceStationSceneBuilder
         MainMenuButton(mainMenuPanel, "OptionsButton", new Vector2(52f, -186f), new Vector2(278f, 32f));
         MainMenuButton(mainMenuPanel, "HowToPlayButton", new Vector2(52f, -222f), new Vector2(278f, 32f));
         MainMenuButton(mainMenuPanel, "CreditsButton", new Vector2(52f, -257f), new Vector2(278f, 32f));
-        MainMenuButton(mainMenuPanel, "QuitButton", new Vector2(52f, -292f), new Vector2(278f, 32f));
     }
 
     private static Sprite LoadMainMenuCoverSprite()

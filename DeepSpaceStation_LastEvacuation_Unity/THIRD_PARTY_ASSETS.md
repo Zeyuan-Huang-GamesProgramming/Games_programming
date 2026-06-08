@@ -17,11 +17,10 @@ Some assets in this project were downloaded as free Unity resources. "Free" does
 not automatically mean that the original asset source files may be republished
 in a public GitHub repository.
 
-In particular, the locally retained `Assets/Free Skyboxes - Space/Readme.txt`
-identifies Dogmatic as the copyright holder and states that redistribution of
-the skybox pack is not permitted. The raw files for that pack must therefore not
-be published in a public source repository unless separate permission is
-obtained.
+In particular, the included `Assets/Free Skyboxes - Space/Readme.txt` identifies
+Dogmatic as the copyright holder and states that redistribution of the skybox
+pack is not permitted. The raw files for that pack must therefore not be
+published in a public source repository unless separate permission is obtained.
 
 Before making this repository public, each third-party package should be checked
 against its current publisher licence and the
@@ -39,6 +38,7 @@ local import or a compiled playable build.
 | **Free Skyboxes - Space** | Background space environment; the playable scene uses the `SBS Space 1/Large` skybox material. | `Assets/Free Skyboxes - Space/` | Copyright Dogmatic, all rights reserved, as identified by the supplied README. That README explicitly prohibits redistribution. The source files must be excluded from a public GitHub release unless permission is granted. |
 | **Teko Bold typeface asset** | Display font used for the science-fiction HUD and TextMesh Pro UI styling; a TextMesh Pro SDF font asset is generated from it. | `Assets/Fonts/Teko-Bold.ttf`; `Assets/Fonts/Teko-Bold SDF.asset` | The font file was sourced during development from an installed Unity package sample in this local project. A specific font licence file has not yet been retained with the imported font, so its upstream licence and attribution must be confirmed before public redistribution of the font file. |
 | **TextMesh Pro Essential Resources** | Text rendering resources supporting the UI conversion and HUD presentation. | `Assets/TextMesh Pro/`; package dependency in `Packages/manifest.json` | Unity TextMesh Pro resources. Supplied third-party attributions, including the included font and sprite attribution files, should be preserved when those resources are distributed. |
+| **Tense Future Loop** | Full-game background music loop used to give the main menu and playable station a continuous tense science-fiction atmosphere. | `Assets/Resources/Audio/Music/TenseFutureLoop.ogg` | Downloaded from [OpenGameArt: Tense Future Loop](https://opengameart.org/content/tense-future-loop). The track is marked **CC0 / Public Domain**, so it may be copied, modified, distributed, and used without asking permission or providing attribution. Credit is still recorded here for transparency. |
 
 ## Resources Created for This Project
 
@@ -50,8 +50,10 @@ for this project and are not presented as downloaded asset-pack content:
 - Scene construction and placement logic used to assemble the playable station
   from imported environment assets.
 - HUD layout, opening briefing, results presentation, and settings integration.
-- Runtime procedural game audio, including ambience and feedback sounds. No
-  downloaded audio sample files were identified in the project asset folders.
+- Runtime procedural game audio for station ambience and gameplay feedback
+  sounds.
+- Integration of a CC0 downloaded background music track with the existing
+  audio and volume settings system.
 
 ## Evidence of Responsible Asset Use
 
