@@ -446,6 +446,15 @@ public class GameManager : MonoBehaviour
             UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
     }
 
+    public void ReturnToMainMenu()
+    {
+        IsPaused = false;
+        Time.timeScale = 1f;
+        UnlockCursor();
+        UnityEngine.SceneManagement.SceneManager.LoadScene(
+            UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
+    }
+
     public void RegisterDetection()
     {
         detectionCount++;

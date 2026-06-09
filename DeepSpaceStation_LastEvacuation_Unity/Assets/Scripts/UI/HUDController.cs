@@ -51,6 +51,7 @@ public class HUDController : MonoBehaviour
     private bool oxygenCriticalActive;
     private bool healthCriticalActive;
     private bool timeCriticalActive;
+    private bool pauseExitButtonReady;
 
     private const float OxygenCriticalThreshold = 0.1f;
     private const float OxygenWarningThreshold = 0.25f;
@@ -315,8 +316,74 @@ public class HUDController : MonoBehaviour
 
         if (open)
         {
+            EnsurePauseExitButton();
             RefreshSettingsText();
         }
+    }
+
+    private void EnsurePauseExitButton()
+    {
+        if (pausePanel == null || pauseExitButtonReady)
+        {
+            return;
+        }
+
+        Transform existing = pausePanel.transform.Find("ExitToMainMenuButton");
+        GameObject buttonObject;
+        if (existing == null)
+        {
+            buttonObject = new GameObject("ExitToMainMenuButton", typeof(RectTransform), typeof(Image), typeof(Button));
+            buttonObject.transform.SetParent(pausePanel.transform, false);
+        }
+        else
+        {
+            buttonObject = existing.gameObject;
+        }
+
+        Image image = buttonObject.GetComponent<Image>();
+        Button button = buttonObject.GetComponent<Button>();
+        if (image != null)
+        {
+            image.color = new Color(0.52f, 0.07f, 0.08f, 0.96f);
+        }
+
+        if (button != null)
+        {
+            button.onClick.RemoveAllListeners();
+            button.onClick.AddListener(() => GameManager.Instance?.ReturnToMainMenu());
+            ColorBlock colors = button.colors;
+            colors.normalColor = new Color(0.52f, 0.07f, 0.08f, 0.96f);
+            colors.highlightedColor = new Color(0.88f, 0.18f, 0.16f, 1f);
+            colors.pressedColor = new Color(0.24f, 0.02f, 0.03f, 1f);
+            colors.selectedColor = colors.highlightedColor;
+            colors.colorMultiplier = 1f;
+            colors.fadeDuration = 0.08f;
+            button.colors = colors;
+        }
+
+        RectTransform buttonRect = buttonObject.GetComponent<RectTransform>();
+        SetCenterRect(buttonRect, new Vector2(0f, -184f), new Vector2(270f, 42f));
+
+        TMP_Text label = buttonObject.transform.Find("ExitToMainMenuButtonLabel")?.GetComponent<TMP_Text>();
+        if (label == null)
+        {
+            GameObject labelObject = new GameObject("ExitToMainMenuButtonLabel", typeof(RectTransform));
+            labelObject.transform.SetParent(buttonObject.transform, false);
+            label = labelObject.AddComponent<TextMeshProUGUI>();
+        }
+
+        TMP_Text template = pausePanel.GetComponentInChildren<TMP_Text>(true);
+        label.text = "EXIT TO MAIN MENU";
+        label.font = template == null ? label.font : template.font;
+        label.fontSize = 19f;
+        label.fontStyle = FontStyles.Bold;
+        label.characterSpacing = 2f;
+        label.alignment = TextAlignmentOptions.Center;
+        label.color = Color.white;
+        label.raycastTarget = false;
+        SetCenterRect(label.rectTransform, Vector2.zero, new Vector2(260f, 38f));
+
+        pauseExitButtonReady = true;
     }
 
     public void DecreaseMasterVolume()

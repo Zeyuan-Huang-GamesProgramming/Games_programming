@@ -801,6 +801,7 @@ public static class DeepSpaceStationSceneBuilder
         StyleHUDText(root, "MouseSensitivityLabel", font, primary, 23f, FontStyles.Normal, 2f);
         StyleHUDText(root, "MouseSensitivityValueText", font, warning, 24f, FontStyles.Bold, 2f);
         StyleHUDText(root, "PauseSettingsHint", font, secondary, 17f, FontStyles.Normal, 1.5f);
+        StyleHUDText(root, "ExitToMainMenuButtonLabel", font, Color.white, 19f, FontStyles.Bold, 2f);
         StyleHUDText(root, "EndTitle", font, accent, 38f, FontStyles.Bold, 3f);
         StyleHUDText(root, "EndBody", font, primary, 21f, FontStyles.Normal, 1.5f);
         StyleHUDText(root, "MainMenuHeader", font, accent, 34f, FontStyles.Bold, 2.8f);
@@ -850,6 +851,7 @@ public static class DeepSpaceStationSceneBuilder
         StyleButton(root, "VolumeUpButton", new Color(0.035f, 0.42f, 0.62f, 0.96f));
         StyleButton(root, "SensitivityDownButton", new Color(0.025f, 0.29f, 0.43f, 0.96f));
         StyleButton(root, "SensitivityUpButton", new Color(0.035f, 0.42f, 0.62f, 0.96f));
+        StyleButton(root, "ExitToMainMenuButton", new Color(0.52f, 0.07f, 0.08f, 0.96f));
     }
 
     private static void EnsureMainMenuWidgets(HUDController hud, TMP_FontAsset font)
@@ -1057,6 +1059,12 @@ public static class DeepSpaceStationSceneBuilder
             EnsureSettingButton(pausePanel, "SensitivityDownButton", "-", new Vector2(134f, -82f), font, new UnityEngine.Events.UnityAction(hud.DecreaseMouseSensitivity));
             EnsureSettingButton(pausePanel, "SensitivityUpButton", "+", new Vector2(194f, -82f), font, new UnityEngine.Events.UnityAction(hud.IncreaseMouseSensitivity));
             EnsureTextElement(pausePanel, "PauseSettingsHint", "SETTINGS SAVE AUTOMATICALLY", new Vector2(0f, -158f), TextAlignmentOptions.Center, 17, font, new Vector2(480f, 28f));
+            GameManager manager = Object.FindObjectOfType<GameManager>();
+            if (manager != null)
+            {
+                EnsurePauseActionButton(pausePanel, "ExitToMainMenuButton", "EXIT TO MAIN MENU", new Vector2(0f, -184f), new Vector2(270f, 42f), font, new UnityEngine.Events.UnityAction(manager.ReturnToMainMenu));
+            }
+
             SetObject(hud, "volumeValueText", volumeValue);
             SetObject(hud, "mouseSensitivityValueText", sensitivityValue);
         }
@@ -1153,6 +1161,43 @@ public static class DeepSpaceStationSceneBuilder
         buttonLabel.color = Color.white;
         buttonLabel.fontStyle = FontStyles.Bold;
         if (created)
+        {
+            UnityEventTools.AddPersistentListener(button.onClick, callback);
+        }
+
+        return button;
+    }
+
+    private static Button EnsurePauseActionButton(Transform parent, string name, string label, Vector2 position, Vector2 size, TMP_FontAsset font, UnityEngine.Events.UnityAction callback)
+    {
+        Transform existing = parent.Find(name);
+        bool created = existing == null;
+        GameObject buttonObject;
+        if (created)
+        {
+            buttonObject = new GameObject(name, typeof(RectTransform), typeof(Image), typeof(Button));
+            buttonObject.transform.SetParent(parent, false);
+        }
+        else
+        {
+            buttonObject = existing.gameObject;
+        }
+
+        Image image = buttonObject.GetComponent<Image>();
+        Button button = buttonObject.GetComponent<Button>();
+        image.color = new Color(0.52f, 0.07f, 0.08f, 0.96f);
+        RectTransform rect = buttonObject.GetComponent<RectTransform>();
+        rect.anchorMin = new Vector2(0.5f, 0.5f);
+        rect.anchorMax = new Vector2(0.5f, 0.5f);
+        rect.pivot = new Vector2(0.5f, 0.5f);
+        rect.anchoredPosition = position;
+        rect.sizeDelta = size;
+
+        TMP_Text buttonLabel = EnsureTextElement(buttonObject.transform, name + "Label", label, Vector2.zero, TextAlignmentOptions.Center, 19, font, size);
+        buttonLabel.color = Color.white;
+        buttonLabel.fontStyle = FontStyles.Bold;
+        buttonLabel.characterSpacing = 2f;
+        if (created || button.onClick.GetPersistentEventCount() == 0)
         {
             UnityEventTools.AddPersistentListener(button.onClick, callback);
         }
