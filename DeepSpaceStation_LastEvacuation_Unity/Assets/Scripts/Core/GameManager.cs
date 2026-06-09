@@ -107,7 +107,7 @@ public class GameManager : MonoBehaviour
 
     public void QuitGame()
     {
-        Application.Quit();
+        QuitApplication();
     }
 
     private void ShowModeSelection()
@@ -151,7 +151,7 @@ public class GameManager : MonoBehaviour
                 }
                 else
                 {
-                    Application.Quit();
+                    QuitApplication();
                 }
             }
 
@@ -962,5 +962,15 @@ public class GameManager : MonoBehaviour
         }
 
         HUDController.Instance.SetObjective(objective);
+    }
+
+    private static void QuitApplication()
+    {
+        Time.timeScale = 1f;
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        Application.Quit();
+#endif
     }
 }

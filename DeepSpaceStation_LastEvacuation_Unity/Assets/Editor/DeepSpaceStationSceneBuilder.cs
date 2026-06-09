@@ -749,6 +749,7 @@ public static class DeepSpaceStationSceneBuilder
         TintImage(root, "BackpackPanel", modal);
         TintImage(root, "PausePanel", modal);
         TintImage(root, "EndPanel", overlay);
+        TintImage(root, "EndCard", new Color(0.008f, 0.027f, 0.055f, 0.92f));
         TintImage(root, "MainMenuCommandCard", new Color(0.008f, 0.027f, 0.055f, 0.72f));
         TintImage(root, "MainMenuInfoPanel", new Color(0.008f, 0.027f, 0.055f, 0.7f));
         TintImage(root, "MainMenuPopupPanel", new Color(0.008f, 0.027f, 0.055f, 0.92f));
@@ -761,6 +762,7 @@ public static class DeepSpaceStationSceneBuilder
         AddPanelAccent(root, "StatusPanel", accent);
         AddPanelAccent(root, "BackpackPanel", accent);
         AddPanelAccent(root, "PausePanel", accent);
+        AddPanelAccent(root, "EndCard", accent);
         AddPanelAccent(root, "MainMenuCommandCard", accent);
         AddPanelAccent(root, "MainMenuInfoPanel", accent);
         AddPanelAccent(root, "MainMenuPopupPanel", accent);
@@ -799,8 +801,8 @@ public static class DeepSpaceStationSceneBuilder
         StyleHUDText(root, "MouseSensitivityLabel", font, primary, 23f, FontStyles.Normal, 2f);
         StyleHUDText(root, "MouseSensitivityValueText", font, warning, 24f, FontStyles.Bold, 2f);
         StyleHUDText(root, "PauseSettingsHint", font, secondary, 17f, FontStyles.Normal, 1.5f);
-        StyleHUDText(root, "EndTitle", font, accent, 52f, FontStyles.Bold, 3.5f);
-        StyleHUDText(root, "EndBody", font, primary, 27f, FontStyles.Normal, 2f);
+        StyleHUDText(root, "EndTitle", font, accent, 38f, FontStyles.Bold, 3f);
+        StyleHUDText(root, "EndBody", font, primary, 21f, FontStyles.Normal, 1.5f);
         StyleHUDText(root, "MainMenuHeader", font, accent, 34f, FontStyles.Bold, 2.8f);
         StyleHUDText(root, "MainMenuPrototype", font, secondary, 17f, FontStyles.Bold, 2.4f);
         StyleHUDText(root, "MainMenuTitle", font, accent, 27f, FontStyles.Bold, 2.6f);
@@ -826,8 +828,8 @@ public static class DeepSpaceStationSceneBuilder
         StyleHUDText(root, "RecordsText", font, primary, 18f, FontStyles.Normal, 1.8f);
         StyleHUDText(root, "BriefingTitle", font, accent, 37f, FontStyles.Bold, 3f);
         StyleHUDText(root, "BriefingBody", font, primary, 23f, FontStyles.Normal, 2f);
-        StyleHUDText(root, "EndRecordText", font, warning, 30f, FontStyles.Bold, 2.8f);
-        StyleHUDText(root, "EndHintText", font, secondary, 22f, FontStyles.Bold, 2.2f);
+        StyleHUDText(root, "EndRecordText", font, warning, 23f, FontStyles.Bold, 2.4f);
+        StyleHUDText(root, "EndHintText", font, secondary, 20f, FontStyles.Bold, 2f);
         StyleHUDText(root, "NewGameButtonLabel", font, Color.white, 24f, FontStyles.Bold, 2f);
         StyleHUDText(root, "OptionsButtonLabel", font, primary, 22f, FontStyles.Bold, 1.8f);
         StyleHUDText(root, "HowToPlayButtonLabel", font, primary, 22f, FontStyles.Bold, 1.8f);
@@ -923,7 +925,7 @@ public static class DeepSpaceStationSceneBuilder
 
         if (popup == null)
         {
-            popup = Panel(mainMenuPanel, "MainMenuPopupPanel", new Vector2(-54f, -116f), new Vector2(382f, 342f), new Color(0.008f, 0.027f, 0.055f, 0.92f)).transform;
+            popup = Panel(mainMenuPanel, "MainMenuPopupPanel", new Vector2(-54f, -72f), new Vector2(382f, 302f), new Color(0.008f, 0.027f, 0.055f, 0.92f)).transform;
             TMP_Text title = TextUI(popup, "MainMenuPopupTitle", "OPTIONS", new Vector2(22f, -20f), TextAlignmentOptions.TopLeft, 31, font);
             title.color = new Color(0.08f, 0.82f, 1f);
             title.fontStyle = FontStyles.Bold;
@@ -932,9 +934,9 @@ public static class DeepSpaceStationSceneBuilder
 
             TMP_Text body = TextUI(popup, "MainMenuPopupBody", "", new Vector2(22f, -70f), TextAlignmentOptions.TopLeft, 20, font);
             body.color = new Color(0.78f, 0.92f, 1f);
-            body.GetComponent<RectTransform>().sizeDelta = new Vector2(336f, 148f);
+            body.GetComponent<RectTransform>().sizeDelta = new Vector2(336f, 178f);
 
-            GameObject controls = TopLeftPanel(popup, "MainMenuOptionsControls", new Vector2(20f, -204f), new Vector2(342f, 84f), new Color(0.012f, 0.045f, 0.082f, 0.72f));
+            GameObject controls = TopLeftPanel(popup, "MainMenuOptionsControls", new Vector2(20f, -164f), new Vector2(342f, 84f), new Color(0.012f, 0.045f, 0.082f, 0.72f));
             TMP_Text volumeLabel = TextUI(controls.transform, "MainMenuVolumeLabel", "MASTER VOLUME", new Vector2(12f, -9f), TextAlignmentOptions.TopLeft, 18, font);
             volumeLabel.color = new Color(0.78f, 0.92f, 1f);
             volumeLabel.fontStyle = FontStyles.Bold;
@@ -960,7 +962,7 @@ public static class DeepSpaceStationSceneBuilder
             MainMenuPopupButton(controls.transform, "MainMenuVolumeUpButton", "+", new Vector2(292f, -6f), new Vector2(34f, 28f), font);
             MainMenuPopupButton(controls.transform, "MainMenuSensitivityDownButton", "-", new Vector2(246f, -45f), new Vector2(34f, 28f), font);
             MainMenuPopupButton(controls.transform, "MainMenuSensitivityUpButton", "+", new Vector2(292f, -45f), new Vector2(34f, 28f), font);
-            MainMenuPopupButton(popup, "MainMenuBackButton", "BACK", new Vector2(246f, -294f), new Vector2(98f, 34f), font);
+            MainMenuPopupButton(popup, "MainMenuBackButton", "BACK", new Vector2(246f, -254f), new Vector2(98f, 34f), font);
             controls.SetActive(false);
             popup.gameObject.SetActive(false);
         }
@@ -1062,17 +1064,42 @@ public static class DeepSpaceStationSceneBuilder
         Transform endPanel = FindChild(root, "EndPanel");
         if (endPanel != null)
         {
-            PositionText(root, "EndTitle", new Vector2(0f, 228f));
+            Transform endCard = FindChild(endPanel, "EndCard");
+            if (endCard == null)
+            {
+                endCard = CenterPanel(endPanel, "EndCard", new Vector2(860f, 600f), new Color(0.008f, 0.027f, 0.055f, 0.92f)).transform;
+            }
+
+            RectTransform endCardRect = endCard.GetComponent<RectTransform>();
+            endCardRect.anchorMin = new Vector2(0.5f, 0.5f);
+            endCardRect.anchorMax = new Vector2(0.5f, 0.5f);
+            endCardRect.pivot = new Vector2(0.5f, 0.5f);
+            endCardRect.anchoredPosition = Vector2.zero;
+            endCardRect.sizeDelta = new Vector2(860f, 600f);
+            endCard.SetAsFirstSibling();
+
+            PositionText(root, "EndTitle", new Vector2(0f, 216f));
+            TMP_Text endTitle = FindTMPText(root, "EndTitle");
+            if (endTitle != null)
+            {
+                RectTransform titleRect = endTitle.GetComponent<RectTransform>();
+                titleRect.sizeDelta = new Vector2(780f, 112f);
+                endTitle.alignment = TextAlignmentOptions.Center;
+                endTitle.lineSpacing = -18f;
+            }
+
             TMP_Text endBody = FindTMPText(root, "EndBody");
             if (endBody != null)
             {
                 RectTransform bodyRect = endBody.GetComponent<RectTransform>();
-                bodyRect.anchoredPosition = Vector2.zero;
-                bodyRect.sizeDelta = new Vector2(680f, 390f);
+                bodyRect.anchoredPosition = new Vector2(0f, 8f);
+                bodyRect.sizeDelta = new Vector2(760f, 330f);
+                endBody.alignment = TextAlignmentOptions.TopLeft;
+                endBody.lineSpacing = -8f;
             }
 
-            TMP_Text endRecord = EnsureTextElement(endPanel, "EndRecordText", "", new Vector2(0f, -246f), TextAlignmentOptions.Center, 30, font, new Vector2(760f, 44f));
-            TMP_Text endHint = EnsureTextElement(endPanel, "EndHintText", "R  REDEPLOY", new Vector2(0f, -302f), TextAlignmentOptions.Center, 22, font, new Vector2(620f, 34f));
+            TMP_Text endRecord = EnsureTextElement(endPanel, "EndRecordText", "", new Vector2(0f, -224f), TextAlignmentOptions.Center, 23, font, new Vector2(760f, 42f));
+            TMP_Text endHint = EnsureTextElement(endPanel, "EndHintText", "R  REDEPLOY", new Vector2(0f, -274f), TextAlignmentOptions.Center, 20, font, new Vector2(620f, 34f));
             SetObject(hud, "endRecordText", endRecord);
             SetObject(hud, "endHintText", endHint);
         }
@@ -2439,13 +2466,14 @@ public static class DeepSpaceStationSceneBuilder
         panelRect.offsetMin = Vector2.zero;
         panelRect.offsetMax = Vector2.zero;
 
-        TMP_Text endTitle = TextUI(panel.transform, "EndTitle", "", new Vector2(0f, 150f), TextAlignmentOptions.Center, 52, font);
+        GameObject endCard = CenterPanel(panel.transform, "EndCard", new Vector2(860f, 600f), new Color(0.008f, 0.027f, 0.055f, 0.92f));
+        TMP_Text endTitle = TextUI(endCard.transform, "EndTitle", "", new Vector2(0f, 216f), TextAlignmentOptions.Center, 38, font);
         endTitle.color = uiBlue;
         endTitle.fontStyle = FontStyles.Bold;
-        endTitle.GetComponent<RectTransform>().sizeDelta = new Vector2(720f, 80f);
-        TMP_Text endBody = TextUI(panel.transform, "EndBody", "", new Vector2(0f, -35f), TextAlignmentOptions.Left, 27, font);
+        endTitle.GetComponent<RectTransform>().sizeDelta = new Vector2(780f, 112f);
+        TMP_Text endBody = TextUI(endCard.transform, "EndBody", "", new Vector2(0f, 8f), TextAlignmentOptions.TopLeft, 21, font);
         endBody.color = uiInk;
-        endBody.GetComponent<RectTransform>().sizeDelta = new Vector2(620f, 360f);
+        endBody.GetComponent<RectTransform>().sizeDelta = new Vector2(760f, 330f);
         panel.SetActive(false);
 
         GameObject mainMenuPanel = CreateMainMenuPanel(canvasObject.transform, font, uiBlue, uiInk);

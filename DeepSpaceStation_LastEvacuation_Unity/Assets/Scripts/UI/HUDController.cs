@@ -65,6 +65,12 @@ public class HUDController : MonoBehaviour
     private readonly Color timerNormalColor = new Color(0.6f, 0.95f, 1f);
     private readonly Color timerWarningColor = new Color(1f, 0.22f, 0.12f);
 
+    private static readonly Vector2 MainMenuPopupPosition = new Vector2(-54f, -72f);
+    private static readonly Vector2 MainMenuPopupSize = new Vector2(382f, 302f);
+    private static readonly Vector2 MainMenuPopupBodySize = new Vector2(336f, 178f);
+    private static readonly Vector2 MainMenuOptionsBodySize = new Vector2(336f, 96f);
+    private static readonly Vector2 EndCardSize = new Vector2(780f, 560f);
+
     public bool HasMainMenu => mainMenuPanel != null;
     public bool IsMainMenuPopupOpen => mainMenuPopupPanel != null && mainMenuPopupPanel.activeSelf;
 
@@ -92,6 +98,7 @@ public class HUDController : MonoBehaviour
         SetBackpackOpen(false);
         SetScan(false, "");
         SetBriefingOpen(false);
+        ApplyMainMenuPopupLayout(false);
         CloseMainMenuPopup();
         RefreshSettingsText();
         SetPauseOpen(false);
@@ -378,6 +385,10 @@ public class HUDController : MonoBehaviour
         if (mainMenuPanel != null)
         {
             mainMenuPanel.SetActive(open);
+            if (open)
+            {
+                ApplyMainMenuPopupLayout(false);
+            }
         }
     }
 
@@ -446,6 +457,7 @@ public class HUDController : MonoBehaviour
             mainMenuOptionsControls.SetActive(showOptionsControls);
         }
 
+        ApplyMainMenuPopupLayout(showOptionsControls);
         RefreshSettingsText();
         SetMainMenuPopupOpen(true);
     }
@@ -456,6 +468,85 @@ public class HUDController : MonoBehaviour
         {
             mainMenuPopupPanel.SetActive(open);
         }
+    }
+
+    private void ApplyMainMenuPopupLayout(bool showOptionsControls)
+    {
+        if (mainMenuPopupPanel == null)
+        {
+            return;
+        }
+
+        RectTransform popupRect = mainMenuPopupPanel.GetComponent<RectTransform>();
+        if (popupRect != null)
+        {
+            popupRect.anchorMin = new Vector2(1f, 1f);
+            popupRect.anchorMax = new Vector2(1f, 1f);
+            popupRect.pivot = new Vector2(1f, 1f);
+            popupRect.anchoredPosition = MainMenuPopupPosition;
+            popupRect.sizeDelta = MainMenuPopupSize;
+        }
+
+        SetTopLeftRect(mainMenuPopupTitleText == null ? null : mainMenuPopupTitleText.rectTransform, new Vector2(22f, -20f), showOptionsControls ? new Vector2(330f, 42f) : new Vector2(244f, 42f));
+        SetTopLeftRect(mainMenuPopupBodyText == null ? null : mainMenuPopupBodyText.rectTransform, new Vector2(22f, -70f), showOptionsControls ? MainMenuOptionsBodySize : MainMenuPopupBodySize);
+
+        RectTransform optionsRect = mainMenuOptionsControls == null ? null : mainMenuOptionsControls.GetComponent<RectTransform>();
+        SetTopLeftRect(optionsRect, new Vector2(20f, -164f), new Vector2(342f, 84f));
+        SetTopLeftRect(FindMainMenuPopupRect("MainMenuVolumeDownButton"), new Vector2(246f, -6f), new Vector2(34f, 28f));
+        SetTopLeftRect(FindMainMenuPopupRect("MainMenuVolumeUpButton"), new Vector2(292f, -6f), new Vector2(34f, 28f));
+        SetTopLeftRect(FindMainMenuPopupRect("MainMenuSensitivityDownButton"), new Vector2(246f, -45f), new Vector2(34f, 28f));
+        SetTopLeftRect(FindMainMenuPopupRect("MainMenuSensitivityUpButton"), new Vector2(292f, -45f), new Vector2(34f, 28f));
+        Vector2 backPosition = showOptionsControls ? new Vector2(246f, -254f) : new Vector2(274f, -18f);
+        Vector2 backSize = showOptionsControls ? new Vector2(98f, 34f) : new Vector2(86f, 30f);
+        SetTopLeftRect(FindMainMenuPopupRect("MainMenuBackButton"), backPosition, backSize);
+        SetCenterRect(FindMainMenuPopupRect("MainMenuBackButtonLabel"), Vector2.zero, backSize);
+    }
+
+    private RectTransform FindMainMenuPopupRect(string objectName)
+    {
+        if (mainMenuPopupPanel == null)
+        {
+            return null;
+        }
+
+        Transform[] children = mainMenuPopupPanel.GetComponentsInChildren<Transform>(true);
+        foreach (Transform child in children)
+        {
+            if (child.name == objectName)
+            {
+                return child.GetComponent<RectTransform>();
+            }
+        }
+
+        return null;
+    }
+
+    private static void SetTopLeftRect(RectTransform rect, Vector2 position, Vector2 size)
+    {
+        if (rect == null)
+        {
+            return;
+        }
+
+        rect.anchorMin = new Vector2(0f, 1f);
+        rect.anchorMax = new Vector2(0f, 1f);
+        rect.pivot = new Vector2(0f, 1f);
+        rect.anchoredPosition = position;
+        rect.sizeDelta = size;
+    }
+
+    private static void SetCenterRect(RectTransform rect, Vector2 position, Vector2 size)
+    {
+        if (rect == null)
+        {
+            return;
+        }
+
+        rect.anchorMin = new Vector2(0.5f, 0.5f);
+        rect.anchorMax = new Vector2(0.5f, 0.5f);
+        rect.pivot = new Vector2(0.5f, 0.5f);
+        rect.anchoredPosition = position;
+        rect.sizeDelta = size;
     }
 
     public void SetRecordsSummary(string summary)
@@ -554,6 +645,10 @@ public class HUDController : MonoBehaviour
     public void ShowEndScreen(string title, string body, string recordBanner)
     {
         SetBriefingOpen(false);
+        SetBackpackOpen(false);
+        SetScan(false, "");
+        SetPauseOpen(false);
+        ApplyEndScreenLayout();
 
         if (endPanel != null)
         {
@@ -562,7 +657,7 @@ public class HUDController : MonoBehaviour
 
         if (endTitleText != null)
         {
-            endTitleText.text = title;
+            endTitleText.text = FormatEndTitle(title);
         }
 
         if (endBodyText != null)
@@ -579,5 +674,123 @@ public class HUDController : MonoBehaviour
         {
             endHintText.text = "R  REDEPLOY";
         }
+    }
+
+    private void ApplyEndScreenLayout()
+    {
+        if (endPanel == null)
+        {
+            return;
+        }
+
+        endPanel.transform.SetAsLastSibling();
+
+        RectTransform panelRect = endPanel.GetComponent<RectTransform>();
+        if (panelRect != null)
+        {
+            panelRect.anchorMin = Vector2.zero;
+            panelRect.anchorMax = Vector2.one;
+            panelRect.pivot = new Vector2(0.5f, 0.5f);
+            panelRect.offsetMin = Vector2.zero;
+            panelRect.offsetMax = Vector2.zero;
+        }
+
+        Image overlay = endPanel.GetComponent<Image>();
+        if (overlay != null)
+        {
+            overlay.color = new Color(0.004f, 0.012f, 0.028f, 0.96f);
+        }
+
+        RectTransform cardRect = EnsureEndCard();
+        if (cardRect != null)
+        {
+            SetCenterRect(cardRect, Vector2.zero, EndCardSize);
+            cardRect.SetAsFirstSibling();
+            MoveToEndCard(endTitleText, cardRect);
+            MoveToEndCard(endBodyText, cardRect);
+            MoveToEndCard(endRecordText, cardRect);
+            MoveToEndCard(endHintText, cardRect);
+        }
+
+        SetCenterRect(endTitleText == null ? null : endTitleText.rectTransform, new Vector2(0f, 202f), new Vector2(700f, 96f));
+        SetCenterRect(endBodyText == null ? null : endBodyText.rectTransform, new Vector2(0f, 8f), new Vector2(680f, 300f));
+        SetCenterRect(endRecordText == null ? null : endRecordText.rectTransform, new Vector2(0f, -204f), new Vector2(680f, 38f));
+        SetCenterRect(endHintText == null ? null : endHintText.rectTransform, new Vector2(0f, -246f), new Vector2(560f, 30f));
+
+        if (endTitleText != null)
+        {
+            endTitleText.alignment = TextAlignmentOptions.Center;
+            endTitleText.fontSize = 31f;
+            endTitleText.fontStyle = FontStyles.Bold;
+            endTitleText.characterSpacing = 3f;
+            endTitleText.lineSpacing = -10f;
+            endTitleText.color = new Color(0.08f, 0.82f, 1f);
+            endTitleText.enableWordWrapping = true;
+        }
+
+        if (endBodyText != null)
+        {
+            endBodyText.alignment = TextAlignmentOptions.TopLeft;
+            endBodyText.fontSize = 17f;
+            endBodyText.fontStyle = FontStyles.Normal;
+            endBodyText.characterSpacing = 1.5f;
+            endBodyText.lineSpacing = -6f;
+            endBodyText.color = new Color(0.78f, 0.92f, 1f);
+            endBodyText.enableWordWrapping = true;
+            endBodyText.overflowMode = TextOverflowModes.Overflow;
+        }
+
+        if (endRecordText != null)
+        {
+            endRecordText.alignment = TextAlignmentOptions.Center;
+            endRecordText.fontSize = 19f;
+            endRecordText.fontStyle = FontStyles.Bold;
+            endRecordText.characterSpacing = 2.4f;
+            endRecordText.color = new Color(1f, 0.69f, 0.2f);
+        }
+
+        if (endHintText != null)
+        {
+            endHintText.alignment = TextAlignmentOptions.Center;
+            endHintText.fontSize = 17f;
+            endHintText.fontStyle = FontStyles.Bold;
+            endHintText.characterSpacing = 2f;
+            endHintText.color = new Color(0.42f, 0.68f, 0.8f);
+        }
+    }
+
+    private RectTransform EnsureEndCard()
+    {
+        Transform card = endPanel.transform.Find("EndCard");
+        if (card == null)
+        {
+            GameObject cardObject = new GameObject("EndCard", typeof(RectTransform), typeof(Image));
+            cardObject.transform.SetParent(endPanel.transform, false);
+            card = cardObject.transform;
+        }
+
+        Image cardImage = card.GetComponent<Image>();
+        if (cardImage != null)
+        {
+            cardImage.color = new Color(0.008f, 0.027f, 0.055f, 0.92f);
+            cardImage.raycastTarget = false;
+        }
+
+        return card.GetComponent<RectTransform>();
+    }
+
+    private static void MoveToEndCard(TMP_Text text, RectTransform cardRect)
+    {
+        if (text == null || cardRect == null || text.transform.parent == cardRect)
+        {
+            return;
+        }
+
+        text.transform.SetParent(cardRect, false);
+    }
+
+    private static string FormatEndTitle(string title)
+    {
+        return string.IsNullOrWhiteSpace(title) ? string.Empty : title.Replace(" // ", "\n");
     }
 }
