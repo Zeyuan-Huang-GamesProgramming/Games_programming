@@ -6,7 +6,7 @@
 | --- | --- |
 | Project | **Deep Space Station: Last Evacuation** |
 | Engine | Unity 2022.3.62f3c1 |
-| Document version | 1.5 |
+| Document version | 1.6 |
 | Record date | Updated on 11 June 2026 |
 | Development period covered | Early May-11 June 2026 |
 | Testing focus | Playable vertical slice stability, build readiness, feedback, UI/audio polish, and professional project organisation |
@@ -53,7 +53,7 @@ The command-line build was run from a temporary copy of the same `Assets`, `Pack
 | VT-02 | 26 May 2026 | Checked the saved `Station_A` scene after the hierarchy organisation improvement. | **PASS** | The saved scene contains organised roots including `00_SYSTEMS`, `01_USER_INTERFACE`, `02_LIGHTING`, `03_TIMED_EVACUATION`, `04_ENDLESS_SURVIVAL`, and `99_UNSORTED`. |
 | VT-03 | 26 May 2026 | Checked the Unity Editor log for the organisation operation. | **PASS** | Unity logged that the production-friendly hierarchy operation completed for `Assets/Scenes/Station_A.unity`. |
 | VT-04 | 11 June 2026 | Inspected build-scene configuration in `ProjectSettings/EditorBuildSettings.asset`. | **PASS** | `Assets/Scenes/Station_A.unity` is listed and enabled in Build Settings. |
-| VT-05 | 11 June 2026 | Exported a Windows 64-bit build using Unity 2022.3.62f3c1 batch mode from a temporary project copy. | **PASS - BUILD/LAUNCH VERIFIED** | Build output was generated at `Builds/Windows/DeepSpaceStation_LastEvacuation.exe`. Build log ends with `Exiting batchmode successfully now!`. |
+| VT-05 | 11 June 2026 | Exported a Windows 64-bit build using Unity 2022.3.62f3c1 batch mode from a temporary project copy. | **PASS - BUILD/LAUNCH VERIFIED** | Build output was generated locally at `Builds/Windows/DeepSpaceStation_LastEvacuation.exe`. The retained local build log ends with `Exiting batchmode successfully now!`. |
 | VT-06 | 11 June 2026 | Launched the exported Windows build for a standalone smoke test. | **PASS - BUILD/LAUNCH VERIFIED** | The process stayed running after 15 seconds and wrote a Player log. The log confirms engine startup and BGM playback: `Deep Space Station BGM playing: TenseFutureLoop`. |
 | VT-07 | 11 June 2026 | Final student manual gameplay sign-off: Timed Evacuation full run and Endless Survival start test. | **PASS - STUDENT PLAYTEST SIGN-OFF** | Timed Evacuation was completed through the main objective flow and result screen. Endless Survival was started successfully and confirmed to show endless-mode HUD/score/threat behaviour. This is a manual gameplay record rather than an automated test. |
 
@@ -125,14 +125,14 @@ This improvement does not change gameplay rules. It improves maintenance, debugg
 | Priority | Final task | Result | Evidence |
 | --- | --- | --- | --- |
 | High | Add `Assets/Scenes/Station_A.unity` to Unity Build Settings. | **PASS** | `ProjectSettings/EditorBuildSettings.asset` lists the scene as enabled. |
-| High | Generate a Windows 64-bit playable build. | **PASS** | `Builds/Windows/DeepSpaceStation_LastEvacuation.exe` was generated on 11 June 2026. |
+| High | Generate a Windows 64-bit playable build. | **PASS** | The Windows build was generated locally at `Builds/Windows/DeepSpaceStation_LastEvacuation.exe` on 11 June 2026. |
 | High | Launch the exported build outside the Unity editor. | **PASS** | Standalone launch smoke test stayed running after 15 seconds and wrote a Player log. |
 | High | Run and record final functional sign-off in both modes. | **PASS** | `FT-01` to `FT-12` are recorded as pass, including Timed Evacuation full run and Endless Survival start test. |
 | Medium | Keep documentation aligned with current controls/features. | **PASS** | README, testing record, asset documentation, final report/supporting documents, and GitHub/Kanban evidence were updated during the final polish cycle. |
 
 ## Manual Test Evidence Note
 
-The final Windows build export and launch are supported by local log files. The detailed gameplay checks for doors, mode selection, pause/settings, results, robot behaviour, oxygen/hazards, and final playthrough are recorded as student manual playtest sign-off because these behaviours require keyboard/mouse gameplay observation rather than a simple automated command-line check.
+The final Windows build export and launch are supported by local log files. The log files are retained as local submission evidence and can be provided with the final report or demo materials if required. The detailed gameplay checks for doors, mode selection, pause/settings, results, robot behaviour, oxygen/hazards, and final playthrough are recorded as student manual playtest sign-off because these behaviours require keyboard/mouse gameplay observation rather than a simple automated command-line check.
 
 For presentation/submission evidence, the strongest supporting material is:
 
@@ -148,12 +148,12 @@ For presentation/submission evidence, the strongest supporting material is:
 | Build date | 11 June 2026 |
 | Platform | Windows 64-bit |
 | Unity version | Unity 2022.3.62f3c1 |
-| Build folder/version | `Builds/Windows/DeepSpaceStation_LastEvacuation.exe` |
+| Build folder/version | Generated locally at `Builds/Windows/DeepSpaceStation_LastEvacuation.exe` |
 | Build method | Unity batchmode build from temporary project copy using current `Assets`, `Packages`, and `ProjectSettings` |
 | Build result | **PASS** |
-| Build evidence | `Logs/FinalBuild_2026-06-11.log` ends with `Exiting batchmode successfully now!` |
+| Build evidence | Local log retained for submission evidence: `Logs/FinalBuild_2026-06-11.log` ends with `Exiting batchmode successfully now!` |
 | Standalone launch result | **PASS** - process launched and stayed running after 15 seconds |
-| Standalone launch evidence | `Logs/FinalBuild_PlayerLaunch_2026-06-11.log` confirms Unity startup and BGM playback |
+| Standalone launch evidence | Local log retained for submission evidence: `Logs/FinalBuild_PlayerLaunch_2026-06-11.log` confirms Unity startup and BGM playback |
 | Timed Evacuation full run result | **PASS** - final route, mission objectives, escape/result flow, records, UI, and audio were confirmed |
 | Endless Survival start/score result | **PASS** - endless spawn, score/threat HUD, robot pressure, and mode-specific loop were confirmed |
 | Audio/settings persistence result | **PASS** - BGM, footsteps, interaction audio, volume setting, and look sensitivity persistence were confirmed |
@@ -171,6 +171,6 @@ For presentation/submission evidence, the strongest supporting material is:
 - Scene creation and hierarchy organiser: `Assets/Editor/DeepSpaceStationSceneBuilder.cs`
 - Playable scene: `Assets/Scenes/Station_A.unity`
 - Build configuration: `ProjectSettings/EditorBuildSettings.asset`
-- Final Windows build: `Builds/Windows/DeepSpaceStation_LastEvacuation.exe`
-- Build log: `Logs/FinalBuild_2026-06-11.log`
-- Standalone launch log: `Logs/FinalBuild_PlayerLaunch_2026-06-11.log`
+- Final Windows build: generated locally at `Builds/Windows/DeepSpaceStation_LastEvacuation.exe`
+- Build log: retained locally for submission evidence, not included in the repository (`Logs/FinalBuild_2026-06-11.log`)
+- Standalone launch log: retained locally for submission evidence, not included in the repository (`Logs/FinalBuild_PlayerLaunch_2026-06-11.log`)
