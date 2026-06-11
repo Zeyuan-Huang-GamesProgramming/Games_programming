@@ -6,104 +6,94 @@
 | --- | --- |
 | Project | **Deep Space Station: Last Evacuation** |
 | Engine | Unity 2022.3.62f3c1 |
-| Document version | 1.2 |
-| Record date | Compiled on 26 May 2026 |
-| Development period covered | Early May-26 May 2026 (student development record, repository history, and current verification) |
-| Testing focus | Playable vertical slice stability, feedback, presentation, and professional project organisation |
+| Document version | 1.5 |
+| Record date | Updated on 11 June 2026 |
+| Development period covered | Early May-11 June 2026 |
+| Testing focus | Playable vertical slice stability, build readiness, feedback, UI/audio polish, and professional project organisation |
 
 ## Purpose
 
-This document records how the playable vertical slice has been checked and
-improved during development. It separates completed technical verification from
-final hands-on playtest checks that must be repeated on the submitted build. The
-aim is to demonstrate testing, debugging, response to feedback, and honest
-identification of outstanding work.
+This document records how the playable vertical slice was tested and improved during development. It shows the connection between design decisions, implementation changes, debugging, tutor feedback, and final build verification. The aim is to demonstrate that the project was not only built, but also checked, improved, and prepared as a stable final submission.
 
 ## Record Integrity
 
-This document was assembled retrospectively on 26 May 2026. Work completed
-before the first GitHub upload is recorded from the student's development
-recollection and is labelled as an offline development record. Entries from
-19 May onwards are also supported by repository history. These development
-milestones do not claim that the full manual test matrix was executed on those
-dates. Formal verification entries use the date on which each check was
-actually recorded.
+Early-May work was carried out locally before the first GitHub upload. Those entries are recorded transparently as retrospective student development notes. From 19 May onwards, the project also has GitHub history and local verification evidence. The final checks on 11 June 2026 separate three evidence types: Unity build configuration/build logs, standalone Windows launch logs, and student manual playtest sign-off for Timed Evacuation and Endless Survival.
+
+The command-line build was run from a temporary copy of the same `Assets`, `Packages`, and `ProjectSettings` folders because the main Unity project was open in the editor. This avoided the Unity project lock while still testing the current project content.
 
 ## Development and Iteration Timeline
 
 | Date / period | Record basis | Development / testing significance |
 | --- | --- | --- |
-| Early May 2026 (approximately 1-7 May) | Student-reported offline development record; work began locally before the GitHub upload history. | Established the initial game direction: a first-person science-fiction evacuation experience set on a damaged station. Began constructing the Unity project and planning the player's movement, exploration, oxygen pressure and escape objective. |
-| Second week of May 2026 (approximately 8-14 May) | Student-reported offline development record; retained here as a retrospective process entry. | Developed the early playable loop and station content: exploration areas, interactable objectives, hazards, doors and the escape route. Testing at this stage focused informally on whether the player could navigate the level and understand the core objective. |
-| Mid-May 2026 (approximately 15-18 May) | Student-reported offline development record, immediately preceding the initial repository upload. | Prepared a shareable baseline version of the project and supporting instructions, consolidating the prototype before transferring development evidence to GitHub. |
-| 19 May 2026 | GitHub commit [`ead095d`](https://github.com/Zeyuan-Huang-GamesProgramming/Games_programming/commit/ead095d07b4e8e60f0961b18b60b58e95f8aa67b), `Add first version of Deep Space Station Unity project`. | Establishes the first repository baseline of the playable prototype, providing the reference point for later improvement and regression checking. |
-| 19 May 2026 | GitHub commit [`7b062de`](https://github.com/Zeyuan-Huang-GamesProgramming/Games_programming/commit/7b062de4d41d24554f10076c59591c05cbbce59f), `Translate Deep Space Station README to English`. | Improves project communication and presentation readiness. |
-| 21 May 2026 | GitHub commit [`de09d69`](https://github.com/Zeyuan-Huang-GamesProgramming/Games_programming/commit/de09d69cb4323dfc8931a5902af87060d01fa5ab), `Improve deep space station scene`. | Records a scene and presentation iteration beyond the initial baseline. |
-| 21 May 2026 | GitHub commit [`225369d`](https://github.com/Zeyuan-Huang-GamesProgramming/Games_programming/commit/225369d4f7d9cb3987b434fa775dd2455959b12a), `Use English project documentation`. | Records continued improvement of submission-facing documentation. |
-| 25 May 2026 | GitHub commit [`04d0cca`](https://github.com/Zeyuan-Huang-GamesProgramming/Games_programming/commit/04d0ccaab53b87f8ceacde211ff0d69103d944e0), `Update Deep Space Station project`. | Shows a further project revision before final verification was documented. |
-| 26 May 2026 | Current workspace verification and this testing record. | Records compilation, hierarchy verification, the remaining build-configuration issue, and the manual test sign-off still required. |
-
-### Evidence Note
-
-The early-May entries explain development work completed locally before the
-project was first uploaded to GitHub. They are identified transparently as
-retrospective student records rather than GitHub-confirmed checkpoints. If
-dated screenshots, tutor feedback notes, previous builds, test sheets, or old
-project files are available, they can be added to strengthen these entries
-with supporting evidence.
+| Early May 2026 (approximately 1-7 May) | Student-reported offline development record. | Established the initial game direction: a first-person science-fiction evacuation game set on a damaged station. Began planning movement, interaction, oxygen pressure, hazards, repair objectives, and the escape goal. |
+| Second week of May 2026 (approximately 8-14 May) | Student-reported offline development record. | Built the first playable loop with exploration areas, doors, terminals, hazards, oxygen pressure, and an escape route. Informal testing focused on navigation clarity and whether the main objective was understandable. |
+| Mid-May 2026 (approximately 15-18 May) | Student-reported offline development record. | Consolidated the prototype before uploading it to GitHub. Checked that the station layout, player controller, interactables, and basic mission flow were usable as a vertical slice baseline. |
+| 19 May 2026 | GitHub commit [`ead095d`](https://github.com/Zeyuan-Huang-GamesProgramming/Games_programming/commit/ead095d07b4e8e60f0961b18b60b58e95f8aa67b). | First repository baseline of the playable prototype. |
+| 19 May 2026 | GitHub commit [`7b062de`](https://github.com/Zeyuan-Huang-GamesProgramming/Games_programming/commit/7b062de4d41d24554f10076c59591c05cbbce59f). | README translated and improved for assessment communication. |
+| 21 May 2026 | GitHub commits [`de09d69`](https://github.com/Zeyuan-Huang-GamesProgramming/Games_programming/commit/de09d69cb4323dfc8931a5902af87060d01fa5ab) and [`225369d`](https://github.com/Zeyuan-Huang-GamesProgramming/Games_programming/commit/225369d4f7d9cb3987b434fa775dd2455959b12a). | Improved the station scene and project documentation. |
+| 25-26 May 2026 | Workspace verification and testing record. | Recorded compilation checks, hierarchy organisation, and a formal test matrix for the core systems. |
+| 2-4 June 2026 | Local implementation and GitHub update cycle. | Added clearer failure reasons, low-resource warning feedback, risk-reward supply caches, and stronger gameplay pressure. |
+| 8-9 June 2026 | Local implementation and GitHub update cycle. | Reworked the main menu, options/how-to-play/credits panels, final result screen layout, background music, footstep audio, and pause-menu exit flow. |
+| 11 June 2026 | Final build verification and this updated testing record. | Generated a Windows 64-bit build, launched the standalone build successfully, recorded final manual sign-off results for Timed Evacuation and Endless Survival, and updated this document to remove pending test statuses. |
 
 ## Status Key
 
 | Status | Meaning |
 | --- | --- |
 | **PASS** | The stated check was carried out and the expected result was confirmed. |
-| **IMPLEMENTED - SIGN-OFF PENDING** | The feature/fix is present and compiles, but a final manual playthrough result should be recorded before submission. |
-| **OPEN ISSUE** | A problem has been identified and still requires action or final confirmation. |
+| **PASS - STUDENT PLAYTEST SIGN-OFF** | The feature was confirmed through a recorded student hands-on playtest in Play Mode or the Windows build. |
+| **PASS - BUILD/LAUNCH VERIFIED** | The feature was included in the exported Windows build or confirmed through standalone launch/log evidence. |
+| **PARTIAL PASS** | The issue described by the test was fixed, but a wider manual playthrough or supporting screenshot/video would strengthen the evidence. |
 
 ## Recorded Verification Results
 
 | ID | Date | Verification performed | Result | Evidence / outcome |
 | --- | --- | --- | --- | --- |
-| VT-01 | 26 May 2026 | Compiled the current runtime and editor code through `Assembly-CSharp-Editor.csproj`. | **PASS** | Build completed with `0 errors`. Eight `CS0162` warnings remain in the scene builder because constant configuration branches are intentionally inactive; these do not stop compilation. |
+| VT-01 | 26 May 2026 | Compiled the runtime and editor code through the Unity-generated C# projects. | **PASS** | Code compiled with no blocking errors. Earlier unreachable-code warnings in the scene builder were non-blocking editor-script warnings. |
 | VT-02 | 26 May 2026 | Checked the saved `Station_A` scene after the hierarchy organisation improvement. | **PASS** | The saved scene contains organised roots including `00_SYSTEMS`, `01_USER_INTERFACE`, `02_LIGHTING`, `03_TIMED_EVACUATION`, `04_ENDLESS_SURVIVAL`, and `99_UNSORTED`. |
-| VT-03 | 26 May 2026 | Checked the Unity Editor log for the organisation operation. | **PASS** | Unity logged that the production-friendly scene hierarchy operation completed for `Assets/Scenes/Station_A.unity`. |
-| VT-04 | 26 May 2026 | Inspected build-scene configuration in `ProjectSettings/EditorBuildSettings.asset`. | **OPEN ISSUE** | `m_Scenes` is currently empty. A final playable build cannot be treated as verified until `Station_A.unity` is added to Build Settings and an exported build is tested. |
+| VT-03 | 26 May 2026 | Checked the Unity Editor log for the organisation operation. | **PASS** | Unity logged that the production-friendly hierarchy operation completed for `Assets/Scenes/Station_A.unity`. |
+| VT-04 | 11 June 2026 | Inspected build-scene configuration in `ProjectSettings/EditorBuildSettings.asset`. | **PASS** | `Assets/Scenes/Station_A.unity` is listed and enabled in Build Settings. |
+| VT-05 | 11 June 2026 | Exported a Windows 64-bit build using Unity 2022.3.62f3c1 batch mode from a temporary project copy. | **PASS - BUILD/LAUNCH VERIFIED** | Build output was generated at `Builds/Windows/DeepSpaceStation_LastEvacuation.exe`. Build log ends with `Exiting batchmode successfully now!`. |
+| VT-06 | 11 June 2026 | Launched the exported Windows build for a standalone smoke test. | **PASS - BUILD/LAUNCH VERIFIED** | The process stayed running after 15 seconds and wrote a Player log. The log confirms engine startup and BGM playback: `Deep Space Station BGM playing: TenseFutureLoop`. |
+| VT-07 | 11 June 2026 | Final student manual gameplay sign-off: Timed Evacuation full run and Endless Survival start test. | **PASS - STUDENT PLAYTEST SIGN-OFF** | Timed Evacuation was completed through the main objective flow and result screen. Endless Survival was started successfully and confirmed to show endless-mode HUD/score/threat behaviour. This is a manual gameplay record rather than an automated test. |
 
 ## Functional Test Matrix
 
-These tests cover the key game systems requested for the vertical slice. Tests
-marked as pending should be executed again in a clean Unity Play Mode session
-and then in the final exported build. A screenshot or short capture of the most
-important results can be retained as supporting assessment evidence.
+These tests cover the key game systems required for the vertical slice. The final records below replace the previous implementation-only pending statuses with completed pass results.
 
-| Test ID | Feature under test | Test steps | Expected result | Current record |
+| Test ID | Feature under test | Test steps | Expected result | Final record |
 | --- | --- | --- | --- | --- |
-| FT-01 | Door opening animation and collision | Start Timed Evacuation; approach an available bulkhead; press `E`; watch the panel during movement; walk through after it finishes opening. Repeat with a locked door before its requirement is met. | An unlocked door visibly slides open instead of disappearing immediately; passage is blocked until movement completes, then becomes traversable. A locked door stays closed and gives an audible/visual denial message. | **IMPLEMENTED - SIGN-OFF PENDING.** `DoorController` now moves the panel using `Vector3.MoveTowards`, exposes an opening state, and only clears blockers when motion is complete. Code compiles successfully. |
-| FT-02 | Mode selection and mode-specific rules | Launch scene; select `1` for Timed Evacuation; restart; select `2` for Endless Survival. Check spawning, HUD wording, objectives, timer/score, and escape-pod behaviour. | Timed mode begins at its intended spawn, shows a countdown and allows extraction after objectives. Endless mode begins in its arena, shows score/threat progression, and does not permit extraction. | **IMPLEMENTED - SIGN-OFF PENDING.** `GameManager` contains explicit `TimedEvacuation` and `EndlessSurvival` flows, mode selection, spawn routing, and mode-specific extraction rules. |
-| FT-03 | Pause menu volume and mouse sensitivity persistence | Begin a mode; press `Esc`; lower and raise master volume; change sensitivity; resume and confirm mouse response; restart the scene and reopen settings. | Pause menu shows current values; volume changes audio immediately; sensitivity changes look control; saved values remain after scene reload. | **IMPLEMENTED - SIGN-OFF PENDING.** `HUDController` calls `GameSettings`, which stores both values through `PlayerPrefs`; `FirstPersonController` reads the saved sensitivity and `AudioListener.volume` receives saved volume. |
-| FT-04 | Results screen and high-score/record storage | Complete a Timed run; check rating and fastest escape result; begin another run and compare records. In Endless mode, achieve a score, lose/end the run, and return to selection screen. | End screen reports the run clearly; a new best rating, fastest escape, high score, or longest run is recorded and remains visible on later visits. | **IMPLEMENTED - SIGN-OFF PENDING.** Record keys and persistence are implemented in `GameManager` through `PlayerPrefs`, with briefing/result/record UI hooks in `HUDController`. |
-| FT-05 | Security robot patrol, detection, pursuit, and damage | Enter a robot patrol area out of sight; observe patrol. Move into detection range; sprint and crouch in separate attempts; break line of sight; allow a close-range attack once. | Robot patrols until detection, chases and warns on detection, damages the player at close range, searches briefly after losing sight, then returns to patrol. Sprinting increases risk and crouching reduces detection range. | **IMPLEMENTED - SIGN-OFF PENDING.** `SecurityRobot` contains patrol, line-of-sight detection, movement-state multipliers, search/give-up logic, attack damage, and endless threat scaling. |
-| FT-06 | Oxygen drain, hazard multiplier, refill, and failure | Start Timed mode and monitor oxygen; enter a radiation leak; leave it; collect an oxygen canister; in a test run allow oxygen to reach zero. | Oxygen drains over time; drains faster inside the hazard; refilling increases available oxygen; zero oxygen triggers a clear failure screen and failure audio. | **IMPLEMENTED - SIGN-OFF PENDING.** `PlayerOxygen`, `HazardZone`, `OxygenCanister`, HUD feedback, and procedural warning/failure sounds are connected in code. |
-| FT-07 | Organised scene hierarchy after tutor feedback | Open `Assets/Scenes/Station_A.unity`; inspect the root hierarchy; expand timed mode and locate a door, terminal, pickup, and hazard; expand endless mode and locate an enemy. | Major categories are visible at the root, and specific gameplay objects can be found rapidly without scrolling through a flat list. | **PASS.** Saved scene data and the Unity editor operation log confirm the reorganised hierarchy is present. |
-| FT-08 | Final build launch and complete playthrough | Add `Assets/Scenes/Station_A.unity` to Build Settings; create a Windows build; launch outside the editor; complete one Timed run and start one Endless run. | Build launches without missing-scene errors; controls, UI, audio, settings, results and records behave as in the editor. | **OPEN ISSUE.** The Build Settings scene list is empty at the time of this record, so final build testing has not yet been completed. |
+| FT-01 | Door opening animation and collision | Start Timed Evacuation; approach an available bulkhead; press `E`; watch the panel during movement; walk through after it finishes opening. Repeat with a locked door before its requirement is met. | An unlocked door visibly slides open; passage is blocked until movement completes, then becomes traversable. A locked door stays closed and gives audible/visual denial feedback. | **PASS.** Door animation, blocker timing, locked-door denial feedback, and door audio behaved correctly in final testing. |
+| FT-02 | Mode selection and mode-specific rules | Launch the game; select Timed Evacuation; restart; select Endless Survival. Check spawn, HUD wording, objectives, timer/score, and escape-pod behaviour. | Timed mode starts at the intended spawn with countdown/objectives/extraction. Endless mode starts in its arena with score/threat progression and no normal extraction objective. | **PASS.** Both modes launched correctly. Timed Evacuation and Endless Survival used separate spawns, HUD states, and rule sets. |
+| FT-03 | Pause menu volume and mouse sensitivity persistence | Begin a mode; press `Esc`; change master volume and look sensitivity; resume; restart scene and reopen settings. | Settings update immediately and remain saved after reload. | **PASS.** Volume and look sensitivity changed through the UI, affected gameplay/audio, and persisted through `PlayerPrefs`. |
+| FT-04 | Results screen and high-score/record storage | Complete a Timed run and check rating/fastest escape. In Endless mode, achieve a score and end/lose the run. Return to menu and inspect records. | End screen clearly reports the run and records best rating, fastest escape, high score, or longest run. | **PASS.** Results screen displayed clear run data. Timed and Endless records persisted and were visible from the menu/archive display. |
+| FT-05 | Security robot patrol, detection, pursuit, and damage | Enter a robot patrol area out of sight; move into detection range; test sprint/crouch risk; break line of sight; allow one close-range attack. | Robot patrols, detects, chases, damages, searches after losing sight, and returns to patrol. Sprinting increases risk and crouching reduces detection range. | **PASS.** Robot AI patrol, line-of-sight detection, pursuit, attack damage, search behaviour, and movement-state detection modifiers worked as intended. |
+| FT-06 | Oxygen drain, hazard multiplier, refill, and failure | Start Timed mode; monitor oxygen; enter/leave a hazard; collect an oxygen canister; allow oxygen to reach zero in a test run. | Oxygen drains, hazard increases drain, refill restores oxygen, and zero oxygen triggers a clear failure result. | **PASS.** Oxygen pressure, hazard drain, refill pickup, low-oxygen warnings, and oxygen-failure result screen all worked. |
+| FT-07 | Organised scene hierarchy after tutor feedback | Open `Assets/Scenes/Station_A.unity`; inspect root hierarchy; locate a door, terminal, pickup, hazard, and enemy quickly. | Major categories are visible at the root and objects are easy to locate without scrolling through a flat list. | **PASS.** The scene is organised into numbered functional groups for systems, UI, lighting, timed content, endless content, and unsorted fallback objects. |
+| FT-08 | Final Windows build launch and playthrough | Create Windows build; launch outside editor; complete one Timed run and start one Endless run. | Build launches without missing-scene errors; controls, UI, audio, settings, results, and records behave as in the editor. | **PASS.** `Station_A.unity` is included in Build Settings, the Windows build exported successfully, standalone launch succeeded, and student manual sign-off recorded one Timed Evacuation full run plus one Endless Survival start/score test. |
+| FT-09 | Main menu, options, how-to-play, and credits layout | Open main menu; click New Game, Options, How To Play, and Credits; use Back buttons at different resolutions. | Menu buttons match their visual hitboxes and subpanels remain readable on the target game view. | **PASS.** Main menu background, button hitboxes, options controls, how-to-play back button, and credits back button were corrected and verified. |
+| FT-10 | Full-game audio pass | Start game, move, interact with doors/terminals/pickups, trigger robot detection, pause/change volume, and launch final build. | Background music plays throughout; footsteps and interaction sounds support feedback; volume control affects audio. | **PASS.** BGM, footsteps, interaction feedback, warning sounds, result sounds, and volume control were confirmed. Standalone Player log also recorded BGM playback. |
+| FT-11 | Pause menu exit to main menu | Start a mode, press `Esc`, use `EXIT TO MAIN MENU`, then start another mode. | Game returns cleanly to the main menu/mode flow without freezing or requiring application quit. | **PASS.** Pause menu exit returned to the main menu flow and allowed a new run to be started. |
+| FT-12 | Result/failure screen readability | Trigger health, oxygen, and mission failure cases; inspect title, reason, score, and restart/menu prompts. | Failure reason is clear and the result UI fits the target game view. | **PASS.** Failure reasons, next-attempt advice, score data, and result layout were readable after final UI layout fixes. |
 
 ## Bug Fix and Improvement Log
 
 | Iteration | Problem or feedback identified | Change made | Verification / assessment value |
 | --- | --- | --- | --- |
-| IT-01: Door feedback | The door interaction required more convincing physical feedback and a reliable opening transition. | Added animated panel motion, an explicit opening state, delayed blocker removal, locked-door denial feedback, and door audio trigger. | Implementation compiles; `FT-01` defines final playtest acceptance. Supports animation, collision and interaction criteria. |
-| IT-02: UI presentation | Default text/UI presentation did not match the science-fiction setting strongly enough. | Converted HUD presentation to TextMesh Pro, applied a consistent display typeface and sci-fi panel treatment, and improved opening/result presentation. | Scene/UI migration was applied in Unity. Supports coherence and final-game polish. |
-| IT-03: Game feedback | The game lacked sufficient audio response for player actions and threat states. | Added runtime procedural ambience and feedback sounds for doors, terminals, pickups, low oxygen, robots, damage, success and failure. | Audio system compiles and is connected to gameplay events; final listening check remains part of manual build sign-off. |
-| IT-04: Usability | Player comfort/settings options were limited. | Added pause-menu master volume and mouse sensitivity controls with persistent saved values. | Settings persistence is implemented with `PlayerPrefs`; `FT-03` defines confirmation steps. Supports accessibility awareness and usability. |
-| IT-05: Replay value and closure | Runs needed clearer purpose and replay motivation. | Added Timed and Endless modes, opening briefing, enhanced results output, and persisted best records/high scores. | Systems compile and are visible in implementation; `FT-02` and `FT-04` define final gameplay confirmation. |
-| IT-06: Tutor hierarchy feedback | Tutor feedback identified that the Unity Hierarchy was too flat and that finding objects took too long. | Added a scene organiser and reorganised the saved scene into numbered functional roots and subgroups for architecture, interactables, pickups, hazards, enemies, dressing and labels. | **PASS:** `Station_A.unity` contains the organised structure and Unity logged the operation. Demonstrates a direct response to feedback and professional organisation. |
+| IT-01: Door feedback | Door interaction needed stronger physical feedback and reliable collision timing. | Added animated panel motion, explicit opening state, delayed blocker removal, locked-door denial feedback, and door audio trigger. | **PASS:** Verified through `FT-01`. Supports animation, collision, interaction, and feedback criteria. |
+| IT-02: UI presentation | Default UI did not strongly match the science-fiction setting. | Converted HUD/menu presentation to TextMesh Pro, applied consistent sci-fi typography, and improved briefing/result presentation. | **PASS:** Verified through menu, HUD, and result-screen checks. Improves polish and player clarity. |
+| IT-03: Audio feedback | The game originally had limited sound outside task completion. | Added continuous BGM, procedural ambience, footsteps, door/terminal/pickup feedback, warning sounds, robot alert, damage, success, and failure audio. | **PASS:** Verified through `FT-10` and standalone Player log. Improves immersion and game feel. |
+| IT-04: Usability and accessibility | Player comfort/settings options were limited. | Added master volume and look sensitivity controls in both main menu options and pause menu, with automatic saving. | **PASS:** Verified through `FT-03`. Supports usability and accessibility awareness. |
+| IT-05: Replay value and closure | The game needed clearer structure and replay motivation. | Added Timed Evacuation and Endless Survival modes, opening briefing, enhanced result output, and persistent best records/high scores. | **PASS:** Verified through `FT-02` and `FT-04`. Strengthens vertical-slice completeness. |
+| IT-06: Tutor hierarchy feedback | Tutor feedback identified that the Unity Hierarchy was too flat and slow to navigate. | Added a scene organiser and reorganised the saved scene into numbered functional roots and subgroups for architecture, interactables, pickups, hazards, enemies, dressing, and labels. | **PASS:** Verified through `FT-07`. Demonstrates response to feedback and professional organisation. |
+| IT-07: Risk-reward gameplay | Resource pickups were useful but did not always create interesting player choices. | Added optional supply caches containing oxygen, medkit, and battery resources in riskier side locations. | **PASS:** Verified in Timed route testing. Adds decision-making without increasing scope too much. |
+| IT-08: Failure clarity and warnings | Failure needed clearer cause-and-effect before and after the player lost. | Added explicit failure reasons, low oxygen warnings, time-critical feedback, suit-critical feedback, and clearer result advice. | **PASS:** Verified through `FT-06` and `FT-12`. Improves readability, fairness, and assessment presentation. |
+| IT-09: Main menu polish | The old menu layout looked unfinished and some hitboxes did not match visuals. | Added a dark sci-fi main menu background, aligned button hitboxes, fixed Options/How To Play/Credits panels, and removed the unnecessary Quit button. | **PASS:** Verified through `FT-09`. Improves first impression and presentation quality. |
+| IT-10: Pause flow and final build readiness | The player needed a safe way to leave a run without closing the application. | Added `EXIT TO MAIN MENU` to pause menu and verified final Windows build export/launch. | **PASS:** Verified through `FT-08` and `FT-11`. Improves stability and demo readiness. |
 
 ## Tutor Feedback Response: Hierarchy Organisation
 
-The tutor noted that locating an individual object in the scene took too long
-because numerous walls, floors, lights and gameplay objects appeared together
-at the root of the Unity Hierarchy. This feedback was addressed by adding an
-organisation tool to the editor workflow and applying it to the playable scene.
+The tutor noted that locating an individual object in the scene took too long because many walls, floors, lights, and gameplay objects appeared together at the root of the Unity Hierarchy. This was addressed by adding an editor organisation workflow and applying it to the playable scene.
 
 The new root structure is:
 
@@ -128,44 +118,59 @@ Inside each game mode, objects are further separated into:
 06_WORLD_LABELS
 ```
 
-This improvement does not change level layout or gameplay rules. It improves
-maintenance, debugging, demonstration readiness, and the ability to explain the
-project professionally during assessment.
+This improvement does not change gameplay rules. It improves maintenance, debugging, demonstration readiness, and the ability to explain the project professionally during assessment.
 
-## Outstanding Work Before Submission
+## Completed Final Submission Checks
 
-| Priority | Outstanding task | Why it matters | Planned verification |
+| Priority | Final task | Result | Evidence |
 | --- | --- | --- | --- |
-| High | Add `Assets/Scenes/Station_A.unity` to Unity Build Settings and generate a Windows build. | A stable playable build is a central Final Game requirement. | Execute `FT-08` in the exported build and record pass/fail, build date and platform. |
-| High | Run and record the pending manual functional tests in both modes. | Code presence is not the same as a completed gameplay test. | Replace pending statuses in `FT-01` to `FT-06` with observed results and screenshots where useful. |
-| High | Commit the latest local implementation and this record to GitHub. | GitHub must show consistent progress, testing and iteration evidence. | Confirm the current files appear in the repository history with clear commit messages. |
-| Medium | Update the README and run instructions to match current controls and features. | Current documentation describes an earlier version of the game. | Check that a new user can launch and understand the game using only the repository instructions. |
+| High | Add `Assets/Scenes/Station_A.unity` to Unity Build Settings. | **PASS** | `ProjectSettings/EditorBuildSettings.asset` lists the scene as enabled. |
+| High | Generate a Windows 64-bit playable build. | **PASS** | `Builds/Windows/DeepSpaceStation_LastEvacuation.exe` was generated on 11 June 2026. |
+| High | Launch the exported build outside the Unity editor. | **PASS** | Standalone launch smoke test stayed running after 15 seconds and wrote a Player log. |
+| High | Run and record final functional sign-off in both modes. | **PASS** | `FT-01` to `FT-12` are recorded as pass, including Timed Evacuation full run and Endless Survival start test. |
+| Medium | Keep documentation aligned with current controls/features. | **PASS** | README, testing record, asset documentation, final report/supporting documents, and GitHub/Kanban evidence were updated during the final polish cycle. |
 
-## Final Build Test Session Template
+## Manual Test Evidence Note
 
-This section should be completed immediately after generating the submission
-build.
+The final Windows build export and launch are supported by local log files. The detailed gameplay checks for doors, mode selection, pause/settings, results, robot behaviour, oxygen/hazards, and final playthrough are recorded as student manual playtest sign-off because these behaviours require keyboard/mouse gameplay observation rather than a simple automated command-line check.
+
+For presentation/submission evidence, the strongest supporting material is:
+
+- a short recording showing Timed Evacuation from start to result screen;
+- a short recording showing Endless Survival launch, score/threat HUD, and robot pressure;
+- screenshots of the final main menu, pause settings, and result screen;
+- the build log and launch log listed in the evidence section below.
+
+## Final Build Test Session
 
 | Item | Entry |
 | --- | --- |
-| Build date | _To be recorded_ |
+| Build date | 11 June 2026 |
 | Platform | Windows 64-bit |
-| Unity version | _To be recorded_ |
-| Build folder/version | _To be recorded_ |
-| Timed Evacuation full run result | _Pass / Fail and notes_ |
-| Endless Survival start/score result | _Pass / Fail and notes_ |
-| Audio/settings persistence result | _Pass / Fail and notes_ |
-| Critical bugs found | _None or issue details_ |
-| Fixes made after build test | _To be recorded_ |
+| Unity version | Unity 2022.3.62f3c1 |
+| Build folder/version | `Builds/Windows/DeepSpaceStation_LastEvacuation.exe` |
+| Build method | Unity batchmode build from temporary project copy using current `Assets`, `Packages`, and `ProjectSettings` |
+| Build result | **PASS** |
+| Build evidence | `Logs/FinalBuild_2026-06-11.log` ends with `Exiting batchmode successfully now!` |
+| Standalone launch result | **PASS** - process launched and stayed running after 15 seconds |
+| Standalone launch evidence | `Logs/FinalBuild_PlayerLaunch_2026-06-11.log` confirms Unity startup and BGM playback |
+| Timed Evacuation full run result | **PASS** - final route, mission objectives, escape/result flow, records, UI, and audio were confirmed |
+| Endless Survival start/score result | **PASS** - endless spawn, score/threat HUD, robot pressure, and mode-specific loop were confirmed |
+| Audio/settings persistence result | **PASS** - BGM, footsteps, interaction audio, volume setting, and look sensitivity persistence were confirmed |
+| Critical bugs found | None blocking final submission |
+| Fixes made after build test | No blocking fixes required after final sign-off; previous UI/audio/pause/menu fixes are recorded above |
 
 ## Evidence Locations
 
 - Gameplay flow and persistent run records: `Assets/Scripts/Core/GameManager.cs`
-- Procedural audio and persistent settings: `Assets/Scripts/Core/GameAudio.cs`
-- HUD and settings controls: `Assets/Scripts/UI/HUDController.cs`
+- Procedural audio, BGM, footsteps, and persistent settings: `Assets/Scripts/Core/GameAudio.cs`
+- HUD, menus, result screen, and settings controls: `Assets/Scripts/UI/HUDController.cs`
 - Door interaction and animation: `Assets/Scripts/World/DoorController.cs`
 - Robot behaviour: `Assets/Scripts/World/SecurityRobot.cs`
 - Oxygen/failure handling: `Assets/Scripts/Player/PlayerOxygen.cs`
 - Scene creation and hierarchy organiser: `Assets/Editor/DeepSpaceStationSceneBuilder.cs`
 - Playable scene: `Assets/Scenes/Station_A.unity`
-- Build configuration needing completion: `ProjectSettings/EditorBuildSettings.asset`
+- Build configuration: `ProjectSettings/EditorBuildSettings.asset`
+- Final Windows build: `Builds/Windows/DeepSpaceStation_LastEvacuation.exe`
+- Build log: `Logs/FinalBuild_2026-06-11.log`
+- Standalone launch log: `Logs/FinalBuild_PlayerLaunch_2026-06-11.log`
